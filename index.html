@@ -262,7 +262,7 @@
     .logo {
       position: absolute;
       left: 46px;
-      top: 32px;
+      top: 28px;
       z-index: 2;
       display: flex;
       align-items: center;
@@ -273,8 +273,8 @@
     }
 
     .logo img {
-      width: 170px;
-      max-height: 42px;
+      width: 128px;
+      max-height: 32px;
       object-fit: contain;
     }
 
@@ -375,6 +375,14 @@
     }
 
     .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 34px;
+      padding: 5px 13px;
+      border: 1px solid rgba(45, 125, 204, .18);
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
       color: var(--blue-700);
       font-size: 17px;
       font-weight: 800;
@@ -415,6 +423,56 @@
     }
 
     .text p + p { margin-top: 14px; }
+
+    .takeaway-steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      max-width: 1240px;
+      margin: 4px 0 2px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .takeaway-steps li {
+      position: relative;
+      min-height: 152px;
+      padding: 22px 20px 20px;
+      border: 1px solid rgba(45, 125, 204, .18);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .72);
+      box-shadow: 0 14px 30px rgba(18, 52, 95, .07);
+    }
+
+    .takeaway-steps .num {
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      margin-bottom: 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--blue-700), var(--green));
+      color: #fff;
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .takeaway-steps strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--blue-900);
+      font-size: clamp(20px, 1.55vw, 26px);
+      line-height: 1.18;
+    }
+
+    .takeaway-steps span:last-child {
+      display: block;
+      color: #405875;
+      font-size: clamp(16px, 1.25vw, 20px);
+      line-height: 1.35;
+      font-weight: 500;
+    }
 
     .point-list {
       display: grid;
@@ -1670,7 +1728,7 @@
         grid-template-columns: 1fr;
       }
 
-      .flow, .two-col, .method, .timeline, .placeholder-grid, .screenshot-gallery, .media-frame, .agenda-grid, .why-how, .ai-demo-layout, #s20 .ai-breakdown-layout, #s20 .ai-workbench-grid {
+      .flow, .two-col, .method, .timeline, .placeholder-grid, .screenshot-gallery, .media-frame, .agenda-grid, .why-how, .takeaway-steps, .ai-demo-layout, #s20 .ai-breakdown-layout, #s20 .ai-workbench-grid {
         grid-template-columns: 1fr;
         display: grid;
       }
@@ -2207,6 +2265,975 @@
       box-shadow: 0 16px 42px rgba(18,52,95,.08);
     }
 
+    .slide.text-heavy .content,
+    .slide.proof-heavy .content,
+    .slide.stat-slide .content {
+      justify-content: center !important;
+      gap: clamp(12px, 1.8vh, 20px);
+      padding-top: 0 !important;
+    }
+
+    .slide.text-heavy h2,
+    .slide.proof-heavy h2,
+    .slide.stat-slide h2 {
+      font-size: clamp(32px, 2.45vw, 46px);
+      line-height: 1.09;
+    }
+
+    .slide.text-heavy .text p,
+    .slide.proof-heavy .text p {
+      font-size: clamp(18px, 1.15vw, 22px);
+      line-height: 1.36;
+    }
+
+    .slide.text-heavy .text p + p,
+    .slide.proof-heavy .text p + p {
+      margin-top: 7px;
+    }
+
+    .slide.text-heavy .quote,
+    .slide.proof-heavy .quote,
+    .slide.stat-slide .quote {
+      max-width: 1180px;
+      padding: 14px 24px;
+      font-size: clamp(21px, 1.55vw, 28px);
+      line-height: 1.24;
+    }
+
+    .slide.proof-heavy .screenshot-gallery {
+      max-width: 1120px;
+      gap: 16px;
+    }
+
+    .slide.proof-heavy .screenshot-card img {
+      height: clamp(168px, 20vh, 196px);
+      aspect-ratio: auto;
+    }
+
+    .detail-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      max-width: 1240px;
+    }
+
+    .detail-card {
+      min-height: 188px;
+      padding: 22px 20px;
+      border: 1px solid rgba(45,125,204,.16);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.88);
+      box-shadow: 0 14px 34px rgba(18,52,95,.075);
+    }
+
+    .detail-card strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--blue-900);
+      font-size: clamp(19px, 1.35vw, 24px);
+      line-height: 1.2;
+    }
+
+    .detail-card p {
+      color: #4c6380;
+      font-size: clamp(15px, .95vw, 18px);
+      line-height: 1.48;
+      font-weight: 600;
+    }
+
+    .stat-compare,
+    .stat-row {
+      display: flex;
+      gap: 14px;
+      max-width: 1120px;
+    }
+
+    .stat-compare {
+      align-items: stretch;
+      margin: 4px 0 2px;
+    }
+
+    .stat-row {
+      flex-wrap: wrap;
+      margin: 0;
+    }
+
+    .stat-card {
+      flex: 1;
+      min-width: 180px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--soft);
+      text-align: center;
+    }
+
+    .stat-card.good {
+      border-color: rgba(33,166,122,.35);
+      background: rgba(33,166,122,.08);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .stat-card.good .stat-label { color: var(--green); }
+
+    .stat-value {
+      margin: 6px 0 3px;
+      color: var(--ink);
+      font-size: clamp(28px, 2.1vw, 38px);
+      line-height: 1.1;
+      font-weight: 850;
+    }
+
+    .stat-card.good .stat-value { color: var(--green); }
+
+    .stat-note {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.35;
+      font-weight: 600;
+    }
+
+    .stat-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--blue-700);
+      font-size: 28px;
+      font-weight: 850;
+    }
+
+    .stat-mini {
+      flex: 1;
+      min-width: 150px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--blue-050);
+      text-align: center;
+    }
+
+    .stat-mini .stat-value {
+      margin: 0 0 2px;
+      color: var(--blue-800);
+      font-size: clamp(23px, 1.65vw, 30px);
+    }
+
+    .outcome-flow {
+      max-width: 1120px;
+    }
+
+    .outcome-flow .flow-card {
+      min-height: 78px;
+      padding: 18px 14px;
+      font-size: clamp(15px, .95vw, 18px);
+    }
+
+    #s16b.stat-slide .text p {
+      font-size: clamp(17px, 1.05vw, 20px);
+      line-height: 1.36;
+    }
+
+    #s16b.stat-slide .quote {
+      font-size: clamp(20px, 1.42vw, 26px);
+    }
+
+    #s8 .content {
+      justify-content: center !important;
+      gap: clamp(7px, 1vh, 11px);
+      padding-top: 0 !important;
+    }
+
+    #s8 h2 {
+      font-size: clamp(30px, 2.35vw, 44px);
+      line-height: 1.08;
+    }
+
+    #s8 .inline-proof-row {
+      gap: 18px;
+    }
+
+    #s8 .text p {
+      font-size: clamp(17px, 1.05vw, 20px);
+      line-height: 1.32;
+    }
+
+    #s8 .screenshot-card img {
+      height: clamp(150px, 18vh, 176px);
+    }
+
+    #s8 .flow-card {
+      min-height: clamp(68px, 8vh, 84px);
+      padding: 13px 12px;
+      font-size: clamp(14px, .92vw, 17px);
+    }
+
+    #s8 .quote {
+      padding: 12px 22px;
+      font-size: clamp(20px, 1.45vw, 26px);
+      line-height: 1.2;
+    }
+
+    #s4 .stat-row {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px !important;
+      max-width: none;
+      margin: 10px 0 0 !important;
+    }
+
+    #s4 .stat-row > div {
+      min-width: 0 !important;
+      min-height: 76px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 10px 12px !important;
+      background: rgba(246,251,255,.9) !important;
+      box-shadow: none;
+    }
+
+    #s4 .stat-row > div > div:first-child {
+      font-size: clamp(20px, 1.45vw, 26px) !important;
+      line-height: 1.08 !important;
+      white-space: nowrap;
+    }
+
+    #s4 .stat-row > div > div:nth-child(2) {
+      margin-top: 5px;
+      font-size: clamp(12px, .78vw, 14px) !important;
+      line-height: 1.25;
+      white-space: normal;
+    }
+
+    #s4 .content,
+    #s13 .content,
+    #s20 .content {
+      padding-top: clamp(16px, 2.2vh, 24px) !important;
+    }
+
+    #s11 .content {
+      gap: 16px !important;
+      padding-top: 8px !important;
+    }
+
+    #s11 .screenshot-card img {
+      height: clamp(138px, 16vh, 158px) !important;
+    }
+
+    #s11 .quote {
+      margin-top: 2px;
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
+    }
+
+    #s4 .stage-kicker,
+    #s11 .stage-kicker,
+    #s13 .stage-kicker,
+    #s20 .eyebrow {
+      margin-left: 0;
+    }
+
+    #s13 .content {
+      padding-top: 4px !important;
+      gap: clamp(6px, .9vh, 10px);
+    }
+
+    #s4 .s4-proof-copy {
+      max-width: 1260px;
+    }
+
+    #s6 .content {
+      display: grid;
+      grid-template-columns: minmax(0, 690px) minmax(360px, 1fr);
+      grid-template-areas:
+        "kicker kicker"
+        "title title"
+        "text text"
+        "shots steps"
+        "quote quote";
+      align-content: center;
+      column-gap: 42px;
+      row-gap: clamp(12px, 1.7vh, 20px) !important;
+      padding-top: 0 !important;
+    }
+
+    #s6 .stage-kicker {
+      grid-area: kicker;
+    }
+
+    #s6 h2 {
+      grid-area: title;
+      font-size: clamp(36px, 2.75vw, 50px) !important;
+      line-height: 1.08 !important;
+    }
+
+    #s6 .content > .text {
+      grid-area: text;
+    }
+
+    #s6 .manual-strip {
+      grid-area: shots;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      width: 100%;
+      max-width: 690px;
+      gap: 14px;
+    }
+
+    #s6 .manual-strip .screenshot-card img {
+      height: 96px !important;
+      object-fit: cover;
+      object-position: top left;
+    }
+
+    #s6 .manual-strip .screenshot-card span {
+      min-height: 28px;
+      padding: 5px 7px;
+      font-size: 11px;
+      line-height: 1.15;
+    }
+
+    #s6 .flow {
+      gap: 12px !important;
+    }
+
+    #s6 .s6-step-strip {
+      grid-area: steps;
+      display: grid;
+      grid-template-columns: repeat(3, 104px);
+      justify-content: center;
+      align-content: center;
+      width: 100%;
+      max-width: 420px;
+      gap: 16px !important;
+      align-self: center;
+      justify-self: center;
+      margin-top: 0;
+    }
+
+    #s6 .flow-card {
+      min-height: 0 !important;
+      aspect-ratio: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 14px !important;
+      font-size: clamp(12px, .78vw, 14px) !important;
+      line-height: 1.2 !important;
+      text-align: center;
+    }
+
+    #s6 .s6-step-strip .flow-card::before {
+      position: static;
+      display: block;
+      margin-bottom: 10px;
+      font-size: 32px;
+      line-height: .9;
+    }
+
+    #s6 .s6-step-strip .flow-card::after {
+      display: none;
+    }
+
+    #s6 .quote {
+      grid-area: quote;
+      margin-top: 8px;
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
+    }
+
+    #s13 .text p {
+      font-size: clamp(17px, 1.03vw, 20px);
+      line-height: 1.3;
+    }
+
+    #s13 .two-col {
+      grid-template-columns: minmax(430px, 520px) minmax(420px, 1fr);
+      max-width: 1160px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    #s13 .screenshot-card img {
+      height: 250px !important;
+      max-height: none;
+      object-fit: cover;
+      object-position: left top;
+      transform: scale(1.12);
+      transform-origin: left top;
+    }
+
+    #s13 .screenshot-card {
+      width: min(100%, 520px);
+      justify-self: start;
+    }
+
+    #s13 .panel {
+      align-self: start;
+      min-height: 0 !important;
+      padding: 12px 18px;
+    }
+
+    #s20 .ai-breakdown-layout {
+      transform: scale(.96);
+      transform-origin: top left;
+      width: 104%;
+    }
+
+    #s20 .quote {
+      margin-top: -12px;
+    }
+
+    #s13 .steps {
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    #s13 .steps li {
+      min-height: 31px;
+      padding: 5px 11px;
+      font-size: clamp(15px, .92vw, 17px);
+    }
+
+    #s13 .quote {
+      margin-top: 0;
+      padding: 4px 22px;
+      font-size: clamp(19px, 1.35vw, 25px);
+      line-height: 1.18;
+    }
+
+    #s19b .flow {
+      gap: 14px;
+      max-width: 1320px;
+    }
+
+    #s19b .flow-card {
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      min-height: 118px !important;
+      padding: 16px 16px 14px !important;
+      text-align: left;
+      font-size: clamp(15px, .95vw, 18px) !important;
+      line-height: 1.2 !important;
+    }
+
+    #s19b .flow-card::before {
+      position: static;
+      display: block;
+      margin-bottom: 8px;
+      color: rgba(30, 87, 148, .25);
+      font-size: clamp(28px, 2.1vw, 38px);
+      line-height: .9;
+    }
+
+    #s19b .flow-card br {
+      display: none;
+    }
+
+    #s19b .flow-card small {
+      display: block;
+      margin-top: 6px;
+      color: #4f6682;
+      font-size: clamp(12px, .72vw, 14px);
+      line-height: 1.28;
+      font-weight: 800;
+    }
+
+    /* Readability unification layer for the revised deck. */
+    .slide:not(.cover) .text {
+      font-size: clamp(19px, 1.34vw, 23px);
+      line-height: 1.44;
+    }
+
+    .slide:not(.cover) .text p {
+      line-height: 1.44;
+    }
+
+    .slide.text-heavy .text p,
+    .slide.proof-heavy .text p,
+    #s13 .text p,
+    #s20 .text p {
+      font-size: clamp(19px, 1.18vw, 22px);
+      line-height: 1.38;
+    }
+
+    .flow-card {
+      min-height: 88px;
+      padding: 24px 15px 16px;
+      font-size: clamp(16px, 1.02vw, 19px);
+      line-height: 1.25;
+    }
+
+    .flow-card::before {
+      top: 8px;
+      left: 13px;
+      color: rgba(30, 87, 148, .24);
+      font-size: clamp(30px, 2.25vw, 40px);
+      letter-spacing: 0;
+    }
+
+    .detail-cards {
+      counter-reset: detail-card;
+    }
+
+    .detail-card {
+      position: relative;
+      padding-top: 30px;
+    }
+
+    .detail-card::before {
+      counter-increment: detail-card;
+      content: counter(detail-card, decimal-leading-zero);
+      position: absolute;
+      left: 15px;
+      top: 9px;
+      color: rgba(30, 87, 148, .22);
+      font-size: 32px;
+      font-weight: 950;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .quote {
+      max-width: 1180px;
+      padding: 17px 26px 17px 30px;
+      font-size: clamp(23px, 1.65vw, 30px) !important;
+      line-height: 1.26;
+    }
+
+    .quote::before {
+      font-size: clamp(36px, 2.7vw, 46px);
+    }
+
+    .screenshot-card span {
+      min-height: 34px;
+      font-size: clamp(13px, .86vw, 15px);
+    }
+
+    .screenshot-gallery.compact-four .screenshot-card span {
+      min-height: 32px;
+      font-size: 13px !important;
+      line-height: 1.2;
+    }
+
+    .iteration-item span {
+      font-size: clamp(14px, .88vw, 16px);
+      line-height: 1.42;
+    }
+
+    .iteration-item strong {
+      font-size: clamp(16px, 1vw, 18px);
+    }
+
+    #s4 .flow-card,
+    #s6 .flow-card,
+    #s8 .flow-card,
+    #s16 .flow-card,
+    #s19b .flow-card,
+    #s21 .flow-card {
+      min-height: 78px;
+      padding-top: 22px;
+      font-size: clamp(15px, .95vw, 18px);
+    }
+
+    #s4 .quote,
+    #s6 .quote,
+    #s8 .quote,
+    #s13 .quote,
+    #s20 .quote {
+      font-size: clamp(21px, 1.5vw, 27px) !important;
+      padding: 14px 24px 14px 28px;
+      line-height: 1.22;
+    }
+
+    .slide.spacious .content {
+      justify-content: center !important;
+      gap: clamp(26px, 3.6vh, 38px);
+      padding-top: clamp(12px, 2vh, 22px) !important;
+    }
+
+    .slide.spacious h2 {
+      max-width: 1180px;
+      font-size: clamp(42px, 3.2vw, 58px);
+      line-height: 1.1;
+    }
+
+    .slide.spacious .text {
+      max-width: 1300px;
+    }
+
+    .slide.spacious .text p {
+      font-size: clamp(21px, 1.42vw, 26px);
+      line-height: 1.46;
+    }
+
+    .slide.spacious .flow {
+      width: 100%;
+      max-width: 1320px;
+      gap: 24px;
+    }
+
+    .slide.spacious .flow-card {
+      min-height: 118px;
+      padding: 34px 24px 22px;
+      font-size: clamp(19px, 1.25vw, 23px);
+      line-height: 1.25;
+      background: rgba(255,255,255,.86);
+    }
+
+    .slide.spacious .flow-card::before {
+      left: 18px;
+      top: 13px;
+      font-size: clamp(42px, 3vw, 54px);
+      color: rgba(30, 87, 148, .22);
+    }
+
+    .slide.spacious .quote {
+      max-width: 1280px;
+      padding: 22px 34px 22px 38px;
+      font-size: clamp(25px, 1.85vw, 34px) !important;
+      line-height: 1.26;
+    }
+
+    .slide.spacious .detail-cards {
+      max-width: 1260px;
+      gap: 24px;
+    }
+
+    .slide.spacious .detail-card {
+      min-height: 220px;
+      padding: 42px 26px 24px;
+    }
+
+    .slide.spacious .detail-card strong {
+      font-size: clamp(22px, 1.5vw, 28px);
+    }
+
+    .slide.spacious .detail-card p {
+      font-size: clamp(17px, 1.08vw, 20px);
+      line-height: 1.5;
+    }
+
+    /* Final consistency layer: one body size, one KEY summary size. */
+    .slide:not(.cover) .content > .text p {
+      font-size: 21px !important;
+      line-height: 1.42 !important;
+    }
+
+    .slide:not(.cover) .quote {
+      font-size: 24px !important;
+      line-height: 1.26 !important;
+      padding: 18px 28px 18px 32px;
+    }
+
+    .slide:not(.cover) .stage-kicker,
+    .slide:not(.cover) .eyebrow {
+      align-self: flex-start;
+    }
+
+    #s5 .content {
+      gap: clamp(30px, 4vh, 44px);
+    }
+
+    #s5 .text {
+      max-width: 1180px;
+      padding: 24px 30px;
+      border: 1px solid rgba(45,125,204,.16);
+      border-radius: 10px;
+      background: rgba(255,255,255,.72);
+      box-shadow: 0 16px 38px rgba(18,52,95,.07);
+    }
+
+    #s5 .text p {
+      padding-left: 0;
+      line-height: 1.48;
+    }
+
+    #s5 .text p::before {
+      display: none;
+    }
+
+    #s5 .quote {
+      max-width: 1120px;
+      font-size: clamp(27px, 2vw, 38px) !important;
+    }
+
+    #s7 .text p,
+    #s8 .text p,
+    #s16b.stat-slide .text p {
+      font-size: clamp(19px, 1.18vw, 22px) !important;
+      line-height: 1.38;
+    }
+
+    #s4 .content {
+      display: grid;
+      grid-template-columns: minmax(500px, .92fr) minmax(440px, 1fr);
+      grid-template-areas:
+        "kicker kicker"
+        "title title"
+        "text text"
+        "stats flow"
+        "quote quote";
+      align-content: center;
+      column-gap: 34px;
+      row-gap: clamp(10px, 1.45vh, 16px) !important;
+      padding-top: 0 !important;
+    }
+
+    #s4 .stage-kicker {
+      grid-area: kicker;
+    }
+
+    #s4 h2 {
+      grid-area: title;
+      max-width: 1180px;
+      font-size: clamp(42px, 3.15vw, 58px);
+    }
+
+    #s4 .s4-proof-copy {
+      grid-area: text;
+      max-width: 1280px;
+    }
+
+    #s4 .s4-proof-copy p {
+      max-width: 1280px;
+    }
+
+    #s4 .s4-stat-grid {
+      grid-area: stats;
+      display: grid !important;
+      grid-template-columns: repeat(3, clamp(138px, 10.2vw, 164px));
+      justify-content: start;
+      align-self: center;
+      gap: clamp(18px, 2.1vw, 30px) !important;
+      width: 100%;
+      max-width: none;
+      margin: 0 !important;
+    }
+
+    #s4 .s4-stat-grid > div {
+      width: 100%;
+      aspect-ratio: 1;
+      min-height: 0 !important;
+      display: grid;
+      place-items: center;
+      align-content: center;
+      padding: 16px 14px !important;
+      border-radius: 8px !important;
+      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(238,247,255,.9)) !important;
+      box-shadow: 0 14px 28px rgba(18,52,95,.08);
+    }
+
+    #s4 .s4-stat-grid strong {
+      color: var(--blue-800);
+      font-size: clamp(31px, 2.4vw, 42px);
+      font-weight: 950;
+      line-height: .92;
+    }
+
+    #s4 .s4-stat-grid > div:first-child strong {
+      font-size: clamp(24px, 1.85vw, 32px);
+      white-space: nowrap;
+    }
+
+    #s4 .s4-stat-grid > div:nth-child(2) strong {
+      color: var(--orange);
+    }
+
+    #s4 .s4-stat-grid em {
+      display: block;
+      margin-top: 4px;
+      color: var(--blue-900);
+      font-size: clamp(17px, 1.18vw, 22px);
+      font-style: normal;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    #s4 .s4-stat-grid span {
+      display: block;
+      margin-top: 10px;
+      color: #60758f;
+      font-size: clamp(12px, .76vw, 14px);
+      font-weight: 750;
+      line-height: 1.25;
+      text-align: center;
+    }
+
+    #s4 .s4-flow {
+      grid-area: flow;
+      display: grid;
+      grid-template-columns: 1fr;
+      align-self: center;
+      gap: 8px;
+      width: 100%;
+      max-width: 520px;
+      margin: 0 !important;
+    }
+
+    #s4 .slide-proof-row {
+      gap: 18px;
+      margin-top: 10px;
+    }
+
+    #s4 .screenshot-gallery.compact-four {
+      gap: 8px;
+    }
+
+    #s4 .screenshot-card img {
+      height: 76px !important;
+    }
+
+    #s4 .screenshot-card span {
+      min-height: 22px;
+      padding: 4px 6px;
+      font-size: 10px;
+      line-height: 1.15;
+    }
+
+    #s4 .flow-card {
+      justify-content: flex-start;
+      min-height: 42px !important;
+      padding: 11px 16px 10px 58px !important;
+      font-size: clamp(14px, .88vw, 16px) !important;
+      line-height: 1.12 !important;
+      text-align: left;
+    }
+
+    #s4 .s4-flow .flow-card::before {
+      left: 16px;
+      top: 7px;
+      font-size: 30px;
+    }
+
+    #s4 .s4-flow .flow-card::after {
+      display: none;
+    }
+
+    #s4 .quote {
+      grid-area: quote;
+      padding-top: 12px !important;
+      padding-bottom: 12px !important;
+    }
+
+    #s20 .ai-breakdown-layout {
+      margin-top: 10px;
+      transform: scale(.88);
+      width: 114%;
+    }
+
+    #s20 .quote {
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
+      margin-top: -34px;
+    }
+
+    #s1b .content > .text p,
+    #s2 .content > .text p,
+    #s5 .content > .text p,
+    #s7 .content > .text p,
+    #s9 .content > .text p,
+    #s10 .content > .text p,
+    #s11 .content > .text p,
+    #s12 .content > .text p,
+    #s13 .content > .text p,
+    #s14 .content > .text p,
+    #s14b .content > .text p,
+    #s15 .content > .text p,
+    #s15b .content > .text p,
+    #s16 .content > .text p,
+    #s16b .content > .text p,
+    #s17 .content > .text p,
+    #s18 .content > .text p,
+    #s19 .content > .text p,
+    #s19b .content > .text p,
+    #s21 .content > .text p,
+    #s22 .content > .text p {
+      font-size: 21px !important;
+      line-height: 1.42 !important;
+    }
+
+    #s1b .quote,
+    #s2 .quote,
+    #s4 .quote,
+    #s5 .quote,
+    #s6 .quote,
+    #s7 .quote,
+    #s8 .quote,
+    #s9 .quote,
+    #s10 .quote,
+    #s11 .quote,
+    #s12 .quote,
+    #s13 .quote,
+    #s14 .quote,
+    #s14b .quote,
+    #s15 .quote,
+    #s15b .quote,
+    #s16 .quote,
+    #s16b .quote,
+    #s17 .quote,
+    #s18 .quote,
+    #s19 .quote,
+    #s19b .quote,
+    #s20 .quote,
+    #s21 .quote,
+    #s22 .quote {
+      font-size: 24px !important;
+      line-height: 1.26 !important;
+    }
+
+    #s6 .content {
+      grid-template-columns: minmax(0, 650px) minmax(390px, 1fr) !important;
+      column-gap: 38px !important;
+    }
+
+    #s6 .s6-step-strip {
+      grid-template-columns: repeat(3, 118px) !important;
+      max-width: 410px !important;
+      gap: 18px !important;
+    }
+
+    #s6 .s6-step-strip .flow-card {
+      width: 118px !important;
+      height: 118px !important;
+      min-height: 118px !important;
+      padding: 17px 13px !important;
+      font-size: 15px !important;
+      line-height: 1.22 !important;
+    }
+
+    #s6 .s6-step-strip .flow-card::before {
+      font-size: 38px !important;
+      margin-bottom: 11px !important;
+    }
+
+    #s19b .flow-card {
+      min-height: 128px !important;
+      padding: 18px 18px 16px !important;
+      font-size: 19px !important;
+      line-height: 1.22 !important;
+    }
+
+    #s19b .flow-card::before {
+      font-size: 42px !important;
+      margin-bottom: 10px !important;
+    }
+
+    #s19b .flow-card small {
+      font-size: 15px !important;
+      line-height: 1.32 !important;
+    }
+
+    #s8 .inline-proof-row .text p {
+      font-size: 23px !important;
+      line-height: 1.46 !important;
+    }
+
     @media screen and (prefers-reduced-motion: no-preference) {
       .motion-ready .slide [data-reveal] {
         opacity: 0;
@@ -2269,7 +3296,7 @@
 <nav class="deck-nav" aria-label="页面目录"></nav>
 <div class="deck-controls" aria-label="演示控制">
   <button type="button" data-action="prev" title="上一页 (←)">‹</button>
-  <span class="slide-status" aria-live="polite">01 / 26</span>
+  <span class="slide-status" aria-live="polite">01 / 31</span>
   <button type="button" data-action="next" title="下一页 (→)">›</button>
   <button type="button" data-action="fullscreen" title="全屏 (F) / 退出全屏 (G)">F</button>
 </div>
@@ -2289,13 +3316,35 @@
   </section>
 
 
+  <section class="slide" id="s1b">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      <div class="eyebrow">开始之前 · 先聊两句</div>
+      <h2>先问大家一个问题</h2>
+      <div class="text"><p>你每天的工作里，有没有几件<strong>天天重复、又没什么技术含量</strong>的事？</p></div>
+      <ul class="point-list">
+        <li>信息在几个表格、系统之间来回搬、反复核对；</li>
+        <li>只是"换个格式"，却要开好几个文件、改好几遍；</li>
+        <li>事不难，但量一大就累，还容易填错、漏单。</li>
+      </ul>
+      <div class="quote">今天不聊高大上的技术，只聊一件事：怎么把手上重复的活，慢慢交出去。</div>
+    </div>
+  </section>
+
+
   <section class="slide" id="s2">
     <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
     <div class="page-no">00 / 26</div>
     <div class="content">
-      
+
       <h2>这次分享能给大家带来什么</h2>
-      <div class="text"><p>这次不是先讲某个工具有多厉害，而是先看一个日常流程：导单为什么会耗时，问题到底卡在复制、查询、核对，还是卡在吉客云需要的固定导入格式。</p><p>大家可以带走三件事：第一，怎么把人工流程看清楚；第二，怎么在原路走不通时换个方式看待问题，不再只模仿人工动作；第三，怎么把这套拆解方法迁移到其它平台和工作场景。</p></div>
+      <div class="text"><p>不先讲工具多厉害，而是先看清一个日常流程——导单的时间，到底耗在哪。</p></div>
+      <ol class="takeaway-steps">
+        <li><span class="num">1</span><strong>先看清人工流程</strong><span>把每一步动作、字段和规则拆出来，知道真正耗时在哪里。</span></li>
+        <li><span class="num">2</span><strong>卡住时换路径</strong><span>不只模仿人工动作，而是回到目标，重新设计更稳的实现方式。</span></li>
+        <li><span class="num">3</span><strong>迁移到更多场景</strong><span>把这套拆解方法复用到其它平台、表格和重复工作里。</span></li>
+      </ol>
       
       <div class="quote">给大家带来的不是一套固定流程，而是一种把重复业务拆清楚、换个角度重新设计、再逐步优化的方法。</div>
     </div>
@@ -2312,8 +3361,8 @@
       
       
       <div class="media-frame">
-        <div class="video-placeholder">
-          <video class="demo-video" controls preload="metadata">
+        <div class="video-placeholder has-video">
+          <video class="demo-video" controls preload="none" poster="assets/poster_第一版导单.jpg">
             <source src="assets/第一版导单.mp4" type="video/mp4">
           </video>
         </div>
@@ -2335,64 +3384,59 @@
       
       <div class="stage-kicker">阶段 1 / 找痛点</div>
       <h2>先把导单里的真实卡点讲清楚</h2>
-      <div class="slide-proof-row">
-        <div class="text"><p>导单最开始不是难在“不会做”，而是每一次都要把零散信息整理成吉客云能接收的格式。字段要对应，SKU 要核对，格式要调整，分拆规则也要处理。</p><p>以前即使把订单信息整理好了，导入吉客云前还要经过 1、2、3 步格式适配，才能变成吉客云需要的导入表。动作本身不复杂，但每天重复就会消耗时间，也容易出错。</p></div>
-        <div class="screenshot-gallery compact-four">
-          <button class="screenshot-card" type="button" data-lightbox-src="assets/manual-order-source.jpg" aria-label="放大查看原始订单信息截图">
-            <img src="assets/manual-order-source.jpg" alt="原始订单信息截图">
-            <span>转换格式表2 订单导入模板</span>
-          </button>
-          <button class="screenshot-card" type="button" data-lightbox-src="assets/manual-order-import.jpg" aria-label="放大查看导单表截图">
-            <img src="assets/manual-order-import.jpg" alt="导单表截图">
-            <span>转换格式表1 导单表</span>
-          </button>
-          <button class="screenshot-card" type="button" data-lightbox-src="assets/manual-sku-index.jpg" aria-label="放大查看 SKU 索引截图">
-            <img src="assets/manual-sku-index.jpg" alt="SKU 索引截图">
-            <span>转换格式表3 SKU 匹配表</span>
-          </button>
-          <button class="screenshot-card" type="button" data-lightbox-src="assets/manual-registration-table.jpg" aria-label="放大查看登记表截图">
-            <img src="assets/manual-registration-table.jpg" alt="登记表截图">
-            <span>补发登记表</span>
-          </button>
-        </div>
+      <div class="text s4-proof-copy"><p>导单不是难在“不会做”，而是每一单都要把零散信息整理成吉客云能收的格式——字段要对应、SKU 要核对、格式要调整。动作不难，但天天重复就费时、易错。</p></div>
+      <div class="stat-row s4-stat-grid">
+        <div><strong>约 200–300</strong><em>单 / 天</em><span>自营店一天的导单量</span></div>
+        <div><strong>3–4</strong><em>小时</em><span>处理一天的登记补发需要的时间</span></div>
+        <div><strong>全靠</strong><em>人工</em><span>整理、查询、核对都得自己来</span></div>
       </div>
-      <div class="flow"><div class="flow-card">订单信息</div><div class="flow-card">SKU / 物料编码</div><div class="flow-card">字段对应</div><div class="flow-card">格式调整</div><div class="flow-card">吉客云导入表</div></div>
+      <div class="flow s4-flow"><div class="flow-card">订单信息</div><div class="flow-card">SKU / 物料编码</div><div class="flow-card">字段对应</div><div class="flow-card">格式调整</div><div class="flow-card">吉客云导入表</div></div>
       <div class="quote">这一步先不讲工具，先讲清楚：真正消耗人的，是反复把信息改成系统需要的格式。</div>
     </div>
   </section>
 
 
-  <section class="slide" id="s5">
+  <section class="slide spacious" id="s5">
     <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
     <div class="page-no">00 / 26</div>
     <div class="content">
       
       <div class="stage-kicker">阶段 1 补充 / 选一个典型入口</div>
       <h2>为什么从导单讲起</h2>
-      <div class="text"><p>因为导单足够日常，也足够典型。它不是一个“炫技”的技术问题，而是一个真实业务问题：流程能跑，但靠人堆动作；结果能出来，但中间容易慢、漏、错。</p><p>最典型的地方就是吉客云格式适配：之前整理好的信息，不能直接变成最终导入表，还需要一步、两步、三步去调整字段、转换格式、核对分拆规则。</p><p>这类问题不只存在于导单。只要一个工作里有固定字段、固定规则、固定输出，又经常靠人工转换，就可以用类似思路重新拆。</p></div>
-      
-      <div class="quote">导单是入口，真正要看见的是：重复格式转换和规则匹配，能不能被提前固定下来。</div>
+      <div class="text"><p>因为导单足够日常、足够典型：不是炫技的技术问题，而是真实业务问题——流程能跑，但靠人堆动作，中间容易慢、漏、错。这种“反复把信息改成系统要的格式”的活，几乎每个岗位都遇得到。</p></div>
+
+      <div class="quote">先把这个最日常的例子讲透，后面要讲的方法，自然就能套到别的事情上。</div>
     </div>
   </section>
 
 
-  <section class="slide" id="s6">
+  <section class="slide spacious" id="s6">
     <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
     <div class="page-no">00 / 26</div>
     <div class="content">
       
       <div class="stage-kicker">阶段 2 / 拆动作</div>
       <h2>还原人工导单里的 1、2、3 步</h2>
-      <div class="inline-proof-row">
-        <div class="text"><p>拆动作这个阶段最大的价值，不是马上动手自动化，而是把人工真实的操作步骤还原出来。</p><p>不要急着找工具，先把人工反复做的步骤拆清楚：哪些是整理信息，哪些是查询核对，哪些是格式转换。</p><p>只有把每一步都说得出来、能交代清楚，才知道哪一步值得先交给工具。</p></div>
-        <div class="screenshot-gallery single compact-proof">
-          <button class="screenshot-card" type="button" data-lightbox-src="assets/registration-table-optimization.png" aria-label="放大查看售后补发登记表优化截图">
-            <img src="assets/registration-table-optimization.png" alt="售后补发登记表优化截图">
-            <span>登记表优化</span>
-          </button>
-        </div>
+      <div class="text"><p>这一步的价值不是马上动手，而是先把人工步骤还原清楚：哪些是整理信息、哪些是查询核对、哪些是格式转换。每一步都说得出来，才知道哪一步值得先交给工具。</p></div>
+      <div class="screenshot-gallery manual-strip">
+        <button class="screenshot-card" type="button" data-lightbox-src="assets/manual-order-source.jpg" aria-label="放大查看订单导入模板截图">
+          <img src="assets/manual-order-source.jpg" alt="订单导入模板截图">
+          <span>01 订单导入模板</span>
+        </button>
+        <button class="screenshot-card" type="button" data-lightbox-src="assets/manual-order-import.jpg" aria-label="放大查看导单表截图">
+          <img src="assets/manual-order-import.jpg" alt="导单表截图">
+          <span>02 导单表</span>
+        </button>
+        <button class="screenshot-card" type="button" data-lightbox-src="assets/manual-sku-index.jpg" aria-label="放大查看 SKU 匹配表截图">
+          <img src="assets/manual-sku-index-card.jpg" alt="SKU 匹配表截图">
+          <span>03 SKU 匹配表</span>
+        </button>
+        <button class="screenshot-card" type="button" data-lightbox-src="assets/manual-registration-table.jpg" aria-label="放大查看补发登记表截图">
+          <img src="assets/manual-registration-table.jpg" alt="补发登记表截图">
+          <span>04 补发登记表</span>
+        </button>
       </div>
-      <div class="flow"><div class="flow-card">整理订单信息</div><div class="flow-card">查询 SKU / 物料编码</div><div class="flow-card">步骤 1：字段调整</div><div class="flow-card">步骤 2：格式转换</div><div class="flow-card">步骤 3：核对后导入</div></div>
+      <div class="flow s6-step-strip"><div class="flow-card">整理订单信息</div><div class="flow-card">查询 SKU / 物料编码</div><div class="flow-card">字段调整、格式转换、核对导入</div></div>
       <div class="quote">第一步不是找工具，而是把人工的 1、2、3 步拆清楚。</div>
     </div>
   </section>
@@ -2405,7 +3449,7 @@
       
       <div class="stage-kicker">阶段 3A / 固定结构</div>
       <h2>用多维表格固定吉客云格式</h2>
-      <div class="text"><p>后面我们开始用多维表格来承接导单信息。它的价值不只是换一个地方存信息，而是把吉客云需要的字段、格式、分拆规则提前固定下来。</p><p>这样一来，之前那些临时适配的动作，就尽量变成多维表格里的固定结构和固定规则，不再每次重新处理。</p><p>这一阶段还不能叫完全自动化，但它已经从”人每次改格式”，变成”表格提前固定格式”。这是后面继续自动化的基础。</p></div>
+      <div class="text"><p>我们开始用多维表格承接导单信息——价值不在“换个地方存”，而在把吉客云要的字段、格式、分拆规则<strong>提前固定</strong>。从“人每次改格式”变成“表格提前定好格式”：这还不算完全自动化，但它是后面一切的基础。</p></div>
       <div class="screenshot-gallery">
         <button class="screenshot-card" type="button" data-lightbox-src="assets/registration-info.png" aria-label="放大查看登记信息截图">
           <img src="assets/registration-info.png" alt="登记信息截图" onerror="this.closest('.screenshot-card').classList.add('is-missing')">
@@ -2429,7 +3473,7 @@
       <div class="stage-kicker">阶段 3B / 固定规则</div>
       <h2>从多步适配到接近一步到位</h2>
       <div class="inline-proof-row">
-        <div class="text"><p>这一步的变化很关键：我们不是一上来就追求自动导入，而是先把导入前最耗人的格式适配稳定下来。</p><p>通过多维表格，把字段关系、导入模板、分拆规则提前固定，导单表就更接近吉客云直接可用的状态。</p><p>格式稳定之后，后面影刀、AI 或其它自动化动作，才有可靠的数据入口去接住。</p></div>
+        <div class="text"><p>关键不是一上来就追求自动导入，而是先把最耗人的格式适配稳住。</p><p>字段关系、导入模板、分拆规则在多维表格里固定好，导单表就接近“拿来即用”。</p><p>格式稳了，后面影刀、AI 才有可靠的入口去接。</p></div>
         <div class="screenshot-gallery single compact-proof">
           <button class="screenshot-card" type="button" data-lightbox-src="assets/multidimensional-table-matching.jpg" aria-label="放大查看多维表格自动匹配截图">
             <img src="assets/multidimensional-table-matching.jpg" alt="多维表格自动匹配截图">
@@ -2450,8 +3494,8 @@
       <div class="stage-kicker">阶段 3C / 视频演示</div>
       <h2>用多维表格固定格式后，导单流程变成了什么样</h2>
       <div class="media-frame">
-        <div class="video-placeholder">
-          <video class="demo-video" controls preload="metadata">
+        <div class="video-placeholder has-video">
+          <video class="demo-video" controls preload="none" poster="assets/poster_第二版导单.jpg">
             <source src="assets/第二版导单.mp4" type="video/mp4">
           </video>
         </div>
@@ -2472,7 +3516,7 @@
       
       <div class="stage-kicker">阶段 4A / 工具试跑</div>
       <h2>影刀第一版，只接住单号推送</h2>
-      <div class="text"><p>格式稳定之后，我们开始尝试用影刀接住流程里的重复动作。</p><p>第一版真正跑通的，其实只是快递单号导出后的自动推送——范围不大，但证明了一件事：只要动作足够固定，就可以交给工具来做。</p><p>虽然这一版只接住了后半段一个小点，整体反响比较一般，但它是后面继续扩展影刀用途的起点。</p></div>
+      <div class="text"><p>格式稳定后，我们开始用影刀接重复动作。第一版只跑通了一个小点——快递单号的自动推送。范围不大、反响也一般，但它证明了一件事：<strong>只要动作足够固定，就能交给工具</strong>。这就是后面扩展的起点。</p></div>
       <div class="screenshot-gallery">
         <button class="screenshot-card" type="button" data-lightbox-src="assets/yingdao-block-flow.png" aria-label="放大查看影刀第一版推送代码截图">
           <img src="assets/yingdao-block-flow.png" alt="影刀第一版推送代码截图" onerror="this.closest('.screenshot-card').classList.add('is-missing')">
@@ -2495,8 +3539,8 @@
       <div class="stage-kicker">阶段 4A 补充 / 视频演示</div>
       <h2>影刀推送单号演示</h2>
       <div class="media-frame">
-        <div class="video-placeholder">
-          <video class="demo-video" controls preload="metadata">
+        <div class="video-placeholder has-video">
+          <video class="demo-video" controls preload="none" poster="assets/poster_影刀第一版推送.jpg">
             <source src="assets/影刀第一版推送.mp4" type="video/mp4">
           </video>
         </div>
@@ -2510,28 +3554,28 @@
   </section>
 
 
-  <section class="slide" id="s10">
+  <section class="slide text-heavy spacious" id="s10">
     <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
     <div class="page-no">00 / 26</div>
     <div class="content">
       
       <div class="stage-kicker">阶段 4B / 工具扩展</div>
       <h2>开始尝试影刀自动导单</h2>
-      <div class="text"><p>完成单号推送后，下一步就想把影刀用到导单本身。</p><p>当时设想的流程是：影刀读取留存的电子表格，导入多维表格完成匹配，再导出本地 Excel，最后导入吉客云。</p><p>这个想法很符合人的直觉：既然人平时就是这么操作的，那工具是不是也可以照着做？但真正做的时候才发现，工具不一定能完全按照人的方式走完每一步。</p></div>
+      <div class="text"><p>推送跑通后，我们想把导单这件最累的事也整段交给影刀。当时的设想几乎是把人工动作“录”下来：读取电子表格 → 多维表格匹配 → 导出 Excel → 导入吉客云。</p><p>想法很符合直觉——<strong>人怎么点，工具就怎么点</strong>。但真做下去才发现：工具的“手”和人的“手”，不一样。</p></div>
       <div class="flow"><div class="flow-card">读取电子表格留存</div><div class="flow-card">导入多维表格匹配</div><div class="flow-card">导出本地 Excel</div><div class="flow-card">导入吉客云</div></div>
       <div class="quote">第二版影刀的目标，才是真正开始接导单流程。</div>
     </div>
   </section>
 
 
-  <section class="slide" id="s11">
+  <section class="slide proof-heavy" id="s11">
     <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
     <div class="page-no">00 / 26</div>
     <div class="content">
       
       <div class="stage-kicker">阶段 4C / 卡点复盘</div>
       <h2>自动导单卡在导出 Excel</h2>
-      <div class="text"><p>按照设想的四步流程推进时，卡在了”导出本地 Excel”这一步——影刀无法稳定完成这个动作。</p><p>如果继续沿着原路径硬做，成本会越来越高。这时候需要换一种思路：最终目标不是”必须让影刀导出 Excel”，而是拿到吉客云可以导入的文件，路径可以重新设计。</p><p>卡点本身不是问题，真正的问题是执着于原动作、不肯回到目标重新看。</p></div>
+      <div class="text"><p>前三步都顺，偏偏卡在“导出本地 Excel”——影刀时灵时不灵，就是不稳定。一开始我们本能地“硬刚”：调参数、加等待、换点击方式，可越调越不划算。</p><p>后来才醒过来：我们一直在问错的问题。盯着的是“怎么让影刀导出 Excel”，可真正的目标是“<strong>拿到一个吉客云能导入的文件</strong>”——导出 Excel 只是顺手选的路，不是非走不可。</p></div>
       <div class="screenshot-gallery">
         <button class="screenshot-card" type="button" data-lightbox-src="assets/export-excel-block.png" aria-label="放大查看导出 Excel 卡点截图">
           <img src="assets/export-excel-block.png" alt="导出 Excel 卡点截图" onerror="this.closest('.screenshot-card').classList.add('is-missing')">
@@ -2568,8 +3612,8 @@
       <div class="stage-kicker">阶段 4E / 视频演示</div>
       <h2>后面实现了影刀的自动化导单</h2>
       <div class="media-frame">
-        <div class="video-placeholder">
-          <video class="demo-video" controls preload="metadata">
+        <div class="video-placeholder has-video">
+          <video class="demo-video" controls preload="none" poster="assets/poster_导单第一版.jpg">
             <source src="assets/导单第一版.mp4" type="video/mp4">
           </video>
         </div>
@@ -2605,28 +3649,45 @@
   </section>
 
 
-  <section class="slide" id="s14">
+  <section class="slide text-heavy" id="s14">
     <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
     <div class="page-no">00 / 26</div>
     <div class="content">
       
       <div class="stage-kicker">阶段 5B / 新规则</div>
       <h2>SKU 自动匹配</h2>
-      <div class="text"><p>当我们解决了快速读取剪贴板信息之后，新的问题又来了：怎么把订单里的 SKU 和物料编码匹配起来？</p><p>一开始也可以考虑做数据库，但数据库搭建和维护相对麻烦，会改、会维护的小伙伴比较少。为了让后续维护更简单，我们改成读取飞书多维表作为索引。</p><p>多维表更适合大家日常增删查改 SKU 和物料编码，也能被登记软件读取。这样不用维护复杂数据库，也能给后面的自动匹配打基础。</p></div>
+      <div class="text"><p>当我们解决了快速读取剪贴板信息之后，新的问题又来了：怎么把订单里的 SKU 和物料编码自动匹配起来？这一步如果靠人查，依然是最费眼睛、最容易错的环节。</p><p>最"正规"的做法当然是搭一个数据库——查询快、也专业。我们确实认真考虑过，但很快就否了：<strong>数据库搭起来、维护起来都麻烦，团队里会改、敢改的人很少。</strong></p></div>
+      <div class="detail-cards">
+        <article class="detail-card"><strong>技术上可行</strong><p>数据库当然能做查询和匹配，但维护门槛高。</p></article>
+        <article class="detail-card"><strong>业务上未必合适</strong><p>SKU 一变，如果只有少数人敢改，就会形成新的瓶颈。</p></article>
+        <article class="detail-card"><strong>先选能养得起的</strong><p>工具不只看强不强，还要看团队能不能长期维护。</p></article>
+      </div>
+      <div class="quote">选型不是选最强的，而是选团队能长期养得起的。</div>
+    </div>
+  </section>
+
+
+  <section class="slide text-heavy spacious" id="s14b">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      <div class="stage-kicker">阶段 5B 补充 / 索引维护</div>
+      <h2>所以，我们把 SKU 索引放进多维表</h2>
+      <div class="text"><p>我们退一步问自己：这个索引，谁来维护？答案是运营的小伙伴。那就应该选一个<strong>他们本来就会用、随手就能改</strong>的东西——飞书多维表。</p><p>它能像 Excel 一样增删查改，又能被登记软件直接读取。于是我们用多维表当索引，既不用碰复杂数据库，又给后面的自动匹配打好了地基。</p></div>
       <div class="flow"><div class="flow-card">飞书多维表维护索引</div><div class="flow-card">简单增删查改</div><div class="flow-card">登记软件读取</div><div class="flow-card">自动匹配 SKU 和物料编码</div><div class="flow-card">写入多维表格</div></div>
       <div class="quote">不用一开始就做复杂数据库，先用大家能维护的多维表索引把匹配跑稳。</div>
     </div>
   </section>
 
 
-  <section class="slide" id="s15">
+  <section class="slide proof-heavy" id="s15">
     <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
     <div class="page-no">00 / 26</div>
     <div class="content">
       
       <div class="stage-kicker">阶段 5C / 新闭环</div>
       <h2>影刀和登记软件形成闭环</h2>
-      <div class="text"><p>做到登记软件之后，还有一个问题：登记软件和影刀导单之间要真正接起来，不能只是各自少做一步。</p><p>为了连通这两个模块，我们继续研究多维表格：把之前的电子表格登记，改成多维表格登记。</p><p>这样登记软件负责写入多维表格，影刀的读取和后续导单动作也改为围绕多维表格进行，最终实现登记和导单的闭环全流程。</p></div>
+      <div class="text"><p>做到登记软件之后，我们一度以为大功告成了。但用起来才发现一个尴尬：<strong>登记软件和影刀其实是"两段各跑各的"</strong>。</p><p>登记软件把信息写进多维表格，影刀那边还得有人手动把多维表格搬到电子表格里再触发。两边都少做了一步，但合在一起还没有真正连起来。</p></div>
       <div class="screenshot-gallery">
         <button class="screenshot-card" type="button" data-lightbox-src="assets/order-table-before.png" aria-label="放大查看旧版导单表截图">
           <img src="assets/order-table-before.png" alt="旧版导单表截图" onerror="this.closest('.screenshot-card').classList.add('is-missing')">
@@ -2642,15 +3703,29 @@
   </section>
 
 
+  <section class="slide text-heavy spacious" id="s15b">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      <div class="stage-kicker">阶段 5C 补充 / 接成一条线</div>
+      <h2>闭环的关键，是换掉中间那张“死表”</h2>
+      <div class="text"><p>问题出在中间这张电子表格：它是"死"的，谁也没法实时看到对方写了什么。要让两个模块咬合，得换一个两边都能同时读写的"中转站"。</p><p>于是我们又回到多维表格——把电子表格登记，整个改成多维表格登记。登记软件负责写入，影刀围绕同一张表继续读取和导单，中间不再需要人去搬运。</p></div>
+      <div class="flow"><div class="flow-card">登记软件写入</div><div class="flow-card">多维表格中转</div><div class="flow-card">影刀读取</div><div class="flow-card">继续导单</div><div class="flow-card">流程闭环</div></div>
+      <div class="quote">登记和导单，第一次真正接成了一条完整的闭环。</div>
+    </div>
+  </section>
+
+
   <section class="slide" id="s16">
     <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
     <div class="page-no">00 / 26</div>
     <div class="content">
       
-      <h2>流程闭环：登记、导单、推送逐步接上</h2>
-      <div class="text"><p>到这一步，前面的登记、匹配、导单、吉客云导入、单号推送，就开始逐步接上了。</p><p>它不只是多做了一个功能，而是把原来分散的模块接成一条流程。</p><p>很多流程不是一开始就能完整闭环的，通常是先跑通一个点，再接上另一个点，最后才慢慢变成完整链路。</p></div>
+      <div class="stage-kicker">回头看 / 复盘</div>
+      <h2>这条链路，是怎么“一点点”接起来的</h2>
+      <div class="text"><p>回过头看，这套流程并不是一开始就规划好、再一次性搭出来的，而是<strong>一段一段长出来的</strong>：先把最耗人的格式固定下来，再让影刀接住单号推送，接着尝试自动导单、卡住了就换条路径，然后做 AI 登记软件，最后用多维表格把登记和导单真正连到一起。</p><p>每一步都踩着同一个节奏——<strong>先跑通一个点，再接上下一个点</strong>。不追求一步到位，而是让能跑的部分先跑起来，再慢慢把它们串成一条完整链路。</p></div>
       <div class="flow"><div class="flow-card">登记软件录入</div><div class="flow-card">多维表格保存</div><div class="flow-card">影刀读取导单</div><div class="flow-card">生成本地 Excel</div><div class="flow-card">吉客云导入</div><div class="flow-card">单号自动推送</div></div>
-      <div class="quote">完整闭环的价值，是让每个模块不再孤立，而是前后接得上、跑得通。</div>
+      <div class="quote">完整的流程很少是“设计”出来的，多半是“一个点一个点接”出来的——这也是把复杂事情做成的常用方式。</div>
     </div>
   </section>
 
@@ -2662,8 +3737,8 @@
       <div class="stage-kicker">完整链路 / 视频演示</div>
       <h2>完整闭环视频展示</h2>
       <div class="media-frame">
-        <div class="video-placeholder">
-          <video class="demo-video" controls preload="metadata">
+        <div class="video-placeholder has-video">
+          <video class="demo-video" controls preload="none" poster="assets/poster_完整闭环.jpg">
             <source src="assets/完整闭环.mp4" type="video/mp4">
           </video>
         </div>
@@ -2677,15 +3752,52 @@
   </section>
 
 
-  <section class="slide" id="s17">
+  <section class="slide stat-slide" id="s16b">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      <div class="eyebrow">成果 · 算一笔账</div>
+      <h2>改造前后，到底差了多少</h2>
+      <div class="text"><p>讲了这么多过程，最后用一笔真实的账来收尾。就拿“登记补发”这件事来说，改造前后差别很直接：</p></div>
+      <div class="stat-compare">
+        <div class="stat-card">
+          <div class="stat-label">以前 · 一天登记补发</div>
+          <div class="stat-value">3–4 小时</div>
+          <div class="stat-note">整理、查询、核对全靠手动</div>
+        </div>
+        <div class="stat-arrow">→</div>
+        <div class="stat-card good">
+          <div class="stat-label">现在 · 登记 + 影刀接力</div>
+          <div class="stat-value">半小时左右</div>
+          <div class="stat-note">流程接通，新人也能很快上手</div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-mini">
+          <div class="stat-value">约 5 秒</div>
+          <div class="stat-note">其中“登记”这一步的耗时</div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-value">约 200–300 单 / 天</div>
+          <div class="stat-note">自营店一天的导单量</div>
+        </div>
+      </div>
+      <div class="flow outcome-flow"><div class="flow-card">单笔登记到秒级</div><div class="flow-card">新人快速上手</div><div class="flow-card">把人从重复里解放</div><div class="flow-card">方法可复用到别处</div></div>
+      <div class="quote">以前处理一天的登记补发要三四个小时，现在半小时就能搞定；再想想一天还有两百来单要导——效率提上来，省下的都是实打实的时间。</div>
+    </div>
+  </section>
+
+
+  <section class="slide spacious" id="s17">
     <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
     <div class="page-no">00 / 26</div>
     <div class="content">
       
-      <h2>从导单案例抽象出通用问题</h2>
-      <div class="text"><p>如果只看表面，这次是在解决导单。但往下拆一层，它其实是在解决一类更通用的业务问题：把非结构化信息变成结构化数据，把人工判断变成稳定规则，把跨平台动作变成可重复流程。</p><p>导单案例里经历的每一个阶段——先固定格式、再接工具、遇到卡点换路径、最后形成闭环——这条路径本身就是一个可以复用的思路。</p></div>
-      <div class="flow"><div class="flow-card">固定格式结构</div><div class="flow-card">接入自动化工具</div><div class="flow-card">卡点换路径</div><div class="flow-card">模块逐步闭环</div><div class="flow-card">持续迭代稳定</div></div>
-      <div class="quote">导单是案例，背后真正可复用的是”逐步固定、逐步接通”的推进方式。</div>
+      <div class="eyebrow">拉回主题</div>
+      <h2>今天分享的，其实不是“导单”</h2>
+      <div class="text"><p>前面用了很多篇幅讲导单，但我真正想留给大家的，不是这一个案例怎么做，而是背后这套<strong>拆解问题的思维</strong>。</p><p>导单只是一个例子。今天换成发货、对账、建档、做报表，方法是一样的：先看清这件事到底在解决什么，再决定要不要、以及怎么交给工具。</p></div>
+      <div class="flow"><div class="flow-card">看到的是导单</div><div class="flow-card">学到的是思维</div><div class="flow-card">换个场景也能用</div></div>
+      <div class="quote">案例会过时，工具会换代，但“把重复的事拆清楚”的思路可以一直带走。</div>
     </div>
   </section>
 
@@ -2695,10 +3807,16 @@
     <div class="page-no">00 / 26</div>
     <div class="content">
       
-      <h2>这个方法能不能复用到其它场景</h2>
-      <div class="text"><p>在把方法迁移到其他场景之前，先做一个判断：这件事值不值得拆？</p><p>判断标准不是”有没有导单”，而是三个问题：有没有固定输入？中间规则说不说得清楚？最终输出是不是明确的？三个都是，就值得往下拆。</p><p>拆的时候也不要照搬动作，而是照搬逻辑：先把目标定清楚，再看人工怎么做，找到规则在哪里，再决定哪段交给表格、AI 或自动化工具。</p></div>
-      <div class="flow"><div class="flow-card">固定输入？</div><div class="flow-card">规则说得清？</div><div class="flow-card">输出明确？</div><div class="flow-card">值得拆解</div><div class="flow-card">照搬逻辑复用</div></div>
-      <div class="quote">复用的不是某个工具或动作，而是”先判断、再拆解、遇卡点换路径”的思维方式。</div>
+      <div class="eyebrow">底层逻辑</div>
+      <h2>把导单的每一步，还原成它的“本质动作”</h2>
+      <div class="text"><p>导单看起来是一连串琐碎操作，但每一步往下拆一层，其实都在做一件很基础的事。把表象去掉，剩下的就是可以迁移到任何场景的底层逻辑。</p></div>
+      <div class="method">
+        <article class="method-card"><span class="num">1</span><h3>复制订单信息</h3><p>本质是：<strong>拿到输入</strong>——把分散的原始信息收集到一处。</p></article>
+        <article class="method-card"><span class="num">2</span><h3>整理字段</h3><p>本质是：<strong>结构化</strong>——把一段乱文字拆成固定的字段。</p></article>
+        <article class="method-card"><span class="num">3</span><h3>查 SKU、核对编码</h3><p>本质是：<strong>套规则匹配</strong>——按一套稳定关系去对照、补全。</p></article>
+        <article class="method-card"><span class="num">4</span><h3>填导单表、导入吉客云</h3><p>本质是：<strong>产出结果</strong>——生成下游系统要的固定格式。</p></article>
+      </div>
+      <div class="quote">把动作翻译成“输入 → 结构化 → 匹配规则 → 产出结果”，导单就从一个特例变成了通用模板。</div>
     </div>
   </section>
 
@@ -2708,16 +3826,36 @@
     <div class="page-no">00 / 26</div>
     <div class="content">
       
-      <h2>可复用方法：先判断，再拆解</h2>
-      <div class="text"><p>这次分享真正值得大家带走的不是某一个工具，而是学会怎么拆解问题、复用方法，并在原路走不通时换一种方式达成目标。</p><p>如果一个工作高频重复、规则稳定、影响明显，而且有固定输入和明确输出，就可以继续往下拆：目标是什么，人工怎么做，规则在哪里，哪一段适合交给表格、AI 或自动化工具。</p><p>遇到卡点时，不要只盯着原动作，而是回到目标。只要输出结果不变，中间路径可以重新设计。</p></div>
+      <div class="eyebrow">第一步 · 判断</div>
+      <h2>做自动化之前，先问“这件事要不要做自动化”</h2>
+      <div class="text"><p>不是所有事都值得自动化。动手之前先停一下，用下面几个问题过一遍——同时满足，才真正值得投入去做；只满足一两个，手工做反而更划算。</p></div>
       <div class="method">
-      <article class="method-card"><span class="num">1</span><h3>高频重复</h3><p>每天或每周都在做，且步骤差不多。</p></article>
-      <article class="method-card"><span class="num">2</span><h3>规则稳定</h3><p>字段、模板、匹配关系可以被说清楚。</p></article>
-      <article class="method-card"><span class="num">3</span><h3>影响明显</h3><p>一旦慢、漏、错，会影响交付或数据准确性。</p></article>
-      <article class="method-card"><span class="num">4</span><h3>固定输入</h3><p>订单、表格、截图、剪贴板或系统字段可以作为入口。</p></article>
-      <article class="method-card"><span class="num">5</span><h3>明确输出</h3><p>最终要生成记录、文件、消息、报表或系统结果。</p></article>
+        <article class="method-card"><span class="num">1</span><h3>高频重复吗？</h3><p>每天/每周都在做，步骤大同小异。偶尔一次的事，不值得。</p></article>
+        <article class="method-card"><span class="num">2</span><h3>规则稳定吗？</h3><p>字段、模板、匹配关系能说清楚。规则天天变，自动化会很脆。</p></article>
+        <article class="method-card"><span class="num">3</span><h3>影响明显吗？</h3><p>慢、漏、错会影响交付或数据准确。无关痛痒就先放着。</p></article>
+        <article class="method-card"><span class="num">4</span><h3>输入输出固定吗？</h3><p>有明确的入口（订单/表格/截图）和明确的产出（记录/文件/报表）。</p></article>
+      </div>
+      <div class="quote">先判断“值不值得”，再谈“怎么做”——这一步想清楚，能省掉后面大量返工。</div>
     </div>
-      <div class="quote">先判断是不是值得拆，再按“目标-动作-规则-工具-闭环”往下拆。</div>
+  </section>
+
+
+  <section class="slide" id="s19b">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      <div class="eyebrow">第二步 · 怎么做</div>
+      <h2>判断“值得做”之后，按这条线去落地</h2>
+      <div class="text"><p>确定要做自动化，先别急着打开工具。按“目标 → 流程 → 卡点 → 选工具 → 闭环”这条线走，每一段都能想清楚交给谁来做更稳。</p></div>
+      <div class="flow">
+        <div class="flow-card">先定目标<br><small>最终要得到什么结果</small></div>
+        <div class="flow-card">理清流程<br><small>人工现在一步步怎么做</small></div>
+        <div class="flow-card">找到卡点<br><small>哪一步最慢、最容易错</small></div>
+        <div class="flow-card">分段选工具<br><small>表格 / AI / 影刀各管一段</small></div>
+        <div class="flow-card">跑通闭环<br><small>串成可重复的流程</small></div>
+      </div>
+      <div class="text"><p>关键是<strong>不照搬人工动作，只照搬逻辑</strong>：哪段是整理数据交给表格，哪段是判断匹配交给规则或 AI，哪段是跨平台操作交给影刀。遇到走不通，回到目标换一条路径，只要结果不变就行。</p></div>
+      <div class="quote">怎么做的核心不是“学会某个工具”，而是“把流程切成几段，每段交给最合适的那一个”。</div>
     </div>
   </section>
 
@@ -2726,8 +3864,8 @@
     <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
     <div class="page-no">00 / 26</div>
     <div class="content">
-      
-      <h2>让 AI 帮我们拆出自动化思路</h2>
+      <div class="eyebrow">不会拆的时候</div>
+      <h2>自己理不清，就让 AI 帮我们梳理逻辑</h2>
       <div class="ai-breakdown-layout">
         <div class="ai-prompt-panel">
           <div class="text"><p>AI 更适合做“拆解顾问”：先给它目标、流程和卡点，再让它判断优先级。</p></div>
@@ -2772,28 +3910,28 @@
     <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
     <div class="page-no">00 / 26</div>
     <div class="content">
-      <div class="eyebrow">可靠 · 极致</div>
-      <h2>工作中也要多想一步，多做一步</h2>
-      <ul class="point-list">
-        <li>工具会更新换代，但遇到重复工作时先停下来想一想、把它拆清楚的习惯，是长期有用的。</li>
-        <li>先把动作背后的原因、规则和协作关系看清楚，再决定哪些部分值得沉淀成模板、字段、规则或工具。</li>
-        <li>可靠是基础，极致来自持续迭代：每次改进一点，流程就会更顺、更稳、更可复用。</li>
-      </ul>
-      <div class="flow"><div class="flow-card">可靠运行</div><div class="flow-card">看见原因</div><div class="flow-card">沉淀规则</div><div class="flow-card">复用方法</div><div class="flow-card">持续优化</div></div>
-      <div class="quote">极致不是一次做到完美，而是让每一次重复工作都比上一次更可靠。</div>
+      <div class="eyebrow">价值观 · 极致</div>
+      <h2>其实，这就是蓝禾说的“极致”</h2>
+      <div class="text"><p>今天讲的整个过程，刚好就是我们这句极致观的写照——</p></div>
+      <div class="method">
+        <article class="method-card"><span class="num">1</span><h3>想不一样，做不一样</h3><p>影刀卡住时不硬刚，而是回到目标换条路径：想得不一样，也真的做得不一样。</p></article>
+        <article class="method-card"><span class="num">2</span><h3>想多一步，做多一步</h3><p>没停在“导单能跑”，又往前接上登记、匹配、闭环：多想一步，就多做一步。</p></article>
+        <article class="method-card"><span class="num">3</span><h3>做到位，持续做到位</h3><p>从 1 小时到 5 分钟、再到全流程闭环，不是一次做完，而是一版版迭代到位。</p></article>
+      </div>
+      <div class="quote">极致，不是一次做到完美，而是——<strong>持续做到位</strong>。</div>
     </div>
   </section>
 
 
-  <section class="slide" id="s22">
+  <section class="slide spacious" id="s22">
     <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
     <div class="page-no">00 / 26</div>
     <div class="content">
-      <div class="eyebrow">谢谢聆听</div>
-      <h2>今天的分享到这里就结束了</h2>
-      <div class="text"><p>谢谢大家的时间。希望这次分享不只是听完一个导单案例，而是以后遇到类似问题时，能多一个拆解问题的入口。</p><p>先定清目标、再拆流程、找到卡点，遇到走不通就换路径，再决定用表格、AI 还是自动化工具去接。工具会变，但把问题拆清楚、把方法复用起来的能力可以一直带走。</p></div>
-      <div class="flow"><div class="flow-card">定清目标</div><div class="flow-card">拆清流程</div><div class="flow-card">卡点换路径</div><div class="flow-card">沉淀方法</div><div class="flow-card">复用到更多场景</div></div>
-      <div class="quote">愿我们都能把重复的事情慢慢做得更顺、更稳、更有价值。</div>
+      <div class="eyebrow">谢谢聆听 · 留个问题</div>
+      <h2>分享结束，但思考可以继续</h2>
+      <div class="text"><p>谢谢大家的聆听。如果今天能留下点什么，我希望不是“导单怎么做”，而是那句——<strong>想多一步，做多一步</strong>：以后遇到重复的活，能多一个“先停下来拆一拆”的念头。</p><p>所以最后，给大家留一个问题——</p></div>
+      <div class="quote" style="font-size:1.15em;font-weight:600;">回到你自己手上的工作：<br>哪一件每天/每周都在重复的事，<br>是你现在最想拆开、交给工具去做的？</div>
+      <div class="text"><p>带着这个问题回去想一想，随时可以找我们进行探讨。</p></div>
     </div>
   </section>
 
@@ -2808,7 +3946,32 @@
     var revealSteps = [];
     var revealState = [];
     var initialRevealStep = 1;
-    var motionEnabled = window.matchMedia("(prefers-reduced-motion: no-preference)").matches;
+    var motionEnabled = true;
+
+    function applyIntroQuestionReveal(slide) {
+      var textBlocks = slide.querySelectorAll(".content > .text");
+      var orderedGroups = [];
+      orderedGroups.push([slide.querySelector(".logo"), slide.querySelector(".page-no"), slide.querySelector(".eyebrow")]);
+      orderedGroups.push([slide.querySelector("h2")]);
+      if (textBlocks[0]) orderedGroups.push([textBlocks[0]]);
+      if (slide.querySelector(".point-list li")) orderedGroups.push(Array.from(slide.querySelectorAll(".point-list li")));
+      if (textBlocks[1]) orderedGroups.push([textBlocks[1]]);
+      if (slide.querySelector(".quote")) orderedGroups.push([slide.querySelector(".quote")]);
+      var maxStep = 0;
+      var stagger = 0;
+
+      orderedGroups.forEach(function (elements, step) {
+        elements.forEach(function (el) {
+          if (!el) return;
+          el.setAttribute("data-reveal", String(step));
+          el.style.setProperty("--stagger", String(stagger));
+          maxStep = Math.max(maxStep, step);
+          stagger += 1;
+        });
+      });
+
+      return maxStep;
+    }
 
     function setupPresentationMotion() {
       if (!motionEnabled) return;
@@ -2818,7 +3981,7 @@
         var stagedSelectors = [
           [".logo, .page-no, .eyebrow, .stage-kicker"],
           ["h1, h2"],
-          [".lead, .speaker, .body-copy, .text, .point-list li, .pill, .cover-art, .video-placeholder, .placeholder, .screenshot-gallery, .panel, .ai-demo-layout, .ai-breakdown-layout, .two-col, .placeholder-grid, .media-frame, .why-how, .flow-card, .method-card, .agenda-grid, .timeline"],
+          [".lead, .speaker, .body-copy, .text, .stat-row, .point-list li, .takeaway-steps li, .pill, .cover-art, .video-placeholder, .placeholder, .screenshot-gallery, .panel, .ai-demo-layout, .ai-breakdown-layout, .two-col, .placeholder-grid, .media-frame, .why-how, .flow-card, .method-card, .agenda-grid, .timeline"],
           [".quote"]
         ];
         var maxStep = 0;
@@ -2837,6 +4000,10 @@
         slide.querySelectorAll(".flow-card").forEach(function (card, index) {
           card.setAttribute("data-step", String(index + 1).padStart(2, "0"));
         });
+
+        if (slide.id === "s1b") {
+          maxStep = applyIntroQuestionReveal(slide);
+        }
 
         revealSteps[slideIndex] = maxStep;
         revealState[slideIndex] = Math.min(maxStep, initialRevealStep);
