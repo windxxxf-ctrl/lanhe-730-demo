@@ -1,0 +1,3149 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>如何拆解任务，让 AI 和工具替我们工作 | 蓝禾七点半</title>
+  <link rel="icon" href="assets/lanhe-logo.svg" type="image/svg+xml">
+  <style>
+    :root {
+      --blue-900: #12345f;
+      --blue-800: #1e5794;
+      --blue-700: #2d7dcc;
+      --blue-100: #eaf4ff;
+      --blue-050: #f6fbff;
+      --green: #21a67a;
+      --orange: #e59a35;
+      --ink: #17243a;
+      --muted: #66758a;
+      --line: #d9e7f5;
+      --paper: #ffffff;
+      --soft: #f3f7fb;
+      --shadow: 0 22px 56px rgba(18, 52, 95, .12);
+      --radius: 8px;
+      --deck-extra: 28px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: #dfeaf6;
+      scroll-snap-type: x mandatory;
+      overflow-y: hidden;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 10% 8%, rgba(45, 125, 204, .18), transparent 26rem),
+        radial-gradient(circle at 92% 14%, rgba(33, 166, 122, .10), transparent 24rem),
+        linear-gradient(180deg, #eef6ff 0%, #dde9f6 100%);
+      line-height: 1.58;
+      min-width: 100%;
+      width: max-content;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      padding: 28px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+      --deck-scale: 1;
+    }
+
+    body::-webkit-scrollbar {
+      display: none;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .deck-nav {
+      position: fixed;
+      right: 22px;
+      top: 50%;
+      z-index: 20;
+      display: grid;
+      gap: 7px;
+      transform: translateY(-50%);
+    }
+
+    .deck-nav a {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(18, 52, 95, .22);
+      border: 1px solid rgba(255, 255, 255, .75);
+      transition: .2s ease;
+    }
+
+    .deck-nav a:hover {
+      background: var(--blue-700);
+      transform: scale(1.5);
+    }
+
+    .deck-nav a.is-current {
+      background: var(--blue-700);
+      transform: scale(1.75);
+    }
+
+    .deck-controls {
+      position: fixed;
+      right: 20px;
+      bottom: 18px;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px;
+      border: 1px solid rgba(45,125,204,.14);
+      border-radius: 999px;
+      background: rgba(255,255,255,.74);
+      box-shadow: 0 10px 24px rgba(18, 52, 95, .10);
+      backdrop-filter: blur(14px);
+      opacity: .28;
+      transition: opacity .18s ease, transform .18s ease, background .18s ease;
+    }
+
+    .deck-controls:hover,
+    .deck-controls:focus-within {
+      opacity: 1;
+      background: rgba(255,255,255,.92);
+      transform: translateY(-2px);
+    }
+
+    .deck-controls button {
+      min-width: 34px;
+      width: 34px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(45,125,204,.18);
+      border-radius: 999px;
+      background: rgba(234,244,255,.86);
+      color: var(--blue-900);
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .deck-controls button:hover {
+      background: var(--blue-700);
+      color: #fff;
+    }
+
+    .deck-controls .slide-status {
+      min-width: 58px;
+      padding: 0 8px;
+      color: var(--blue-900);
+      font-size: 12px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .slide {
+      position: relative;
+      width: min(calc(100vw - 56px), 1600px);
+      height: min(calc((100vw - 56px) * 9 / 16), 900px);
+      min-height: auto;
+      max-height: none;
+      flex: 0 0 min(calc(100vw - 56px), 1600px);
+      aspect-ratio: 16 / 9;
+      margin: 0;
+      padding: 74px 84px 54px;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.98), rgba(246,251,255,.97)),
+        var(--paper);
+      border: 1px solid rgba(217, 231, 245, .92);
+      box-shadow: var(--shadow);
+      page-break-after: always;
+      break-after: page;
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+      transform: scale(var(--deck-scale));
+      transform-origin: top center;
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(45,125,204,.07) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(45,125,204,.055) 1px, transparent 1px),
+        radial-gradient(circle at 82% 22%, rgba(45,125,204,.20), transparent 20rem),
+        radial-gradient(circle at 18% 82%, rgba(33,166,122,.10), transparent 20rem),
+        linear-gradient(90deg, transparent 0 69%, rgba(45,125,204,.20) 69% calc(69% + 2px), transparent calc(69% + 2px)),
+        linear-gradient(180deg, transparent 0 28%, rgba(45,125,204,.16) 28% calc(28% + 2px), transparent calc(28% + 2px)),
+        radial-gradient(circle at 69% 28%, rgba(45,125,204,.42) 0 4px, rgba(255,255,255,.65) 5px 10px, transparent 11px),
+        radial-gradient(circle at 78% 42%, rgba(45,125,204,.24) 0 3px, transparent 4px),
+        radial-gradient(circle at 88% 65%, rgba(45,125,204,.24) 0 3px, transparent 4px),
+        linear-gradient(135deg, transparent 0 52%, rgba(234,244,255,.62) 52% 67%, transparent 67%);
+      background-size: 44px 44px, 44px 44px, auto, auto, auto, auto, auto, auto, auto, auto;
+      mask-image: linear-gradient(135deg, rgba(0,0,0,.72), transparent 82%);
+    }
+
+    .slide::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 43%;
+      height: 100%;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(45,125,204,.34), rgba(45,125,204,0)) 23% 92px / 220px 4px no-repeat,
+        linear-gradient(90deg, rgba(45,125,204,.24), rgba(45,125,204,0)) 30% 116px / 280px 2px no-repeat,
+        linear-gradient(90deg, rgba(45,125,204,.22), rgba(45,125,204,0)) 43% 140px / 150px 3px no-repeat,
+        linear-gradient(180deg, rgba(45,125,204,.26), rgba(45,125,204,0)) 72% 0 / 2px 100% no-repeat,
+        linear-gradient(180deg, rgba(45,125,204,.18), rgba(45,125,204,0)) 82% 7% / 2px 78% no-repeat,
+        linear-gradient(180deg, rgba(45,125,204,.22), rgba(45,125,204,0)) 90% 15% / 2px 56% no-repeat,
+        radial-gradient(circle at 72% 24%, rgba(45,125,204,.38) 0 4px, transparent 5px),
+        radial-gradient(circle at 82% 40%, rgba(45,125,204,.28) 0 4px, transparent 5px),
+        radial-gradient(circle at 90% 58%, rgba(45,125,204,.26) 0 4px, transparent 5px),
+        radial-gradient(circle at 82% 12%, transparent 0 132px, rgba(45,125,204,.14) 133px 135px, transparent 136px),
+        radial-gradient(circle, rgba(45,125,204,.18) 1px, transparent 1.8px) 62% 84% / 20px 20px no-repeat,
+        linear-gradient(135deg, rgba(234,244,255,.62), transparent 58%);
+      opacity: .94;
+    }
+
+    .slide .content::before {
+      content: "LANHE";
+      position: absolute;
+      right: -18px;
+      bottom: 96px;
+      z-index: -1;
+      color: var(--blue-900);
+      font-size: 128px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: .08em;
+      opacity: .052;
+      pointer-events: none;
+      transform: rotate(-90deg);
+      transform-origin: right bottom;
+    }
+
+    .slide .content::after {
+      content: "";
+      position: absolute;
+      right: -24px;
+      bottom: -24px;
+      width: 520px;
+      height: 190px;
+      pointer-events: none;
+      z-index: -1;
+      background:
+        radial-gradient(circle, rgba(45,125,204,.22) 1px, transparent 1.5px),
+        linear-gradient(90deg, rgba(234,244,255,.88), rgba(234,244,255,.58));
+      background-size: 18px 18px, auto;
+      border-radius: 90px 0 0 0;
+      opacity: .82;
+    }
+
+    .slide .logo::after {
+      content: "";
+      position: absolute;
+      left: -14px;
+      top: 48px;
+      width: 92px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--blue-700), rgba(45,125,204,0));
+      opacity: .58;
+      pointer-events: none;
+    }
+
+    .logo {
+      position: absolute;
+      left: 46px;
+      top: 32px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--blue-900);
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .logo img {
+      width: 170px;
+      max-height: 42px;
+      object-fit: contain;
+    }
+
+    .logo .fallback {
+      display: inline-flex;
+      align-items: center;
+      height: 34px;
+      padding: 0 12px;
+      border-left: 4px solid var(--blue-700);
+      background: rgba(234, 244, 255, .82);
+      border-radius: 4px;
+      font-size: 17px;
+      white-space: nowrap;
+    }
+
+    .cover .logo {
+      left: 72px;
+      top: 58px;
+    }
+
+    .cover .logo img {
+      width: 220px;
+      max-height: 54px;
+    }
+
+    .cover .logo .fallback {
+      height: 46px;
+      font-size: 24px;
+      padding: 0 18px;
+    }
+
+    .page-no {
+      position: absolute;
+      right: 48px;
+      top: 36px;
+      z-index: 2;
+      color: #7b8da7;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 28px;
+    }
+
+    body.is-fullscreen {
+      background: #071b35;
+      gap: 0;
+      padding: 0;
+    }
+
+    body.is-fullscreen .deck-nav {
+      display: none;
+    }
+
+    body.is-fullscreen .slide {
+      width: min(100vw, calc(100vh * 16 / 9));
+      height: min(100vh, calc(100vw * 9 / 16));
+      flex-basis: min(100vw, calc(100vh * 16 / 9));
+      min-height: auto;
+      max-height: none;
+      margin: 0 auto;
+      box-shadow: none;
+      border: none;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      max-width: 980px;
+      font-size: clamp(38px, 5.5vw, 72px);
+      line-height: 1.08;
+      color: var(--blue-900);
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      max-width: 1040px;
+      font-size: clamp(28px, 3.4vw, 48px);
+      line-height: 1.15;
+      color: var(--blue-900);
+      font-weight: 820;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      color: var(--blue-800);
+      font-size: 22px;
+      line-height: 1.25;
+      font-weight: 800;
+    }
+
+    .eyebrow {
+      color: var(--blue-700);
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      max-width: 880px;
+      color: #3c5573;
+      font-size: clamp(19px, 2vw, 30px);
+      line-height: 1.45;
+      font-weight: 500;
+    }
+
+    .text {
+      max-width: 1060px;
+      color: #2f4058;
+      font-size: clamp(18px, 1.55vw, 25px);
+      line-height: 1.48;
+    }
+
+    .text p {
+      position: relative;
+      padding-left: 24px;
+    }
+
+    .text p::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: .7em;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--blue-700);
+      box-shadow: 0 0 0 5px rgba(45, 125, 204, .10);
+    }
+
+    .text p + p { margin-top: 14px; }
+
+    .point-list {
+      display: grid;
+      gap: 16px;
+      max-width: 1240px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      color: #243a58;
+      font-size: clamp(20px, 1.9vw, 29px);
+      line-height: 1.48;
+      font-weight: 500;
+    }
+
+    .point-list li {
+      position: relative;
+      padding-left: 30px;
+    }
+
+    .point-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: .58em;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--blue-700);
+      box-shadow: 0 0 0 6px rgba(45, 125, 204, .10);
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 5px 13px;
+      border: 1px solid rgba(45, 125, 204, .22);
+      border-radius: 999px;
+      color: var(--blue-800);
+      background: rgba(234, 244, 255, .92);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .stage-kicker {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 34px;
+      padding: 5px 13px;
+      border: 1px solid rgba(45, 125, 204, .22);
+      border-radius: 999px;
+      color: var(--blue-800);
+      background: rgba(234, 244, 255, .88);
+      font-size: 15px;
+      font-weight: 850;
+    }
+
+    .quote {
+      max-width: 1120px;
+      padding: 20px 24px 20px 28px;
+      border-left: 6px solid var(--blue-700);
+      border-radius: var(--radius);
+      background: linear-gradient(90deg, rgba(234,244,255,.96), rgba(255,248,236,.80));
+      color: var(--blue-900);
+      font-size: clamp(21px, 2vw, 30px);
+      line-height: 1.36;
+      font-weight: 800;
+    }
+
+    .notes {
+      display: none;
+    }
+
+    .notes strong {
+      color: #517097;
+      font-size: 12px;
+    }
+
+    .flow {
+      display: flex;
+      align-items: stretch;
+      gap: 18px;
+      max-width: 1220px;
+    }
+
+    .flow-card {
+      position: relative;
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100px;
+      padding: 18px 16px;
+      border: 1px solid rgba(45,125,204,.18);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.9);
+      color: #203a5b;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 800;
+      box-shadow: 0 10px 24px rgba(18, 52, 95, .08);
+    }
+
+    .flow-card::after {
+      content: "→";
+      position: absolute;
+      right: -23px;
+      top: 50%;
+      color: var(--blue-700);
+      font-size: 26px;
+      font-weight: 900;
+      transform: translateY(-50%);
+    }
+
+    .flow-card:last-child::after { content: ""; }
+
+    .flow.compact {
+      flex-wrap: wrap;
+    }
+
+    .flow.compact .flow-card {
+      flex: 1 1 165px;
+      min-height: 78px;
+      font-size: 16px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 1220px;
+    }
+
+    .panel {
+      min-height: 260px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.92);
+    }
+
+    .panel.before {
+      background: linear-gradient(180deg, #f7f9fc, #edf3f8);
+    }
+
+    .panel.after {
+      background: linear-gradient(180deg, #eefbf7, #eaf4ff);
+      border-color: rgba(33, 166, 122, .22);
+    }
+
+    .steps {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 42px;
+      padding: 9px 12px;
+      border-radius: 6px;
+      background: rgba(255,255,255,.72);
+      color: #334763;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: var(--blue-700);
+    }
+
+    .before .dot { background: #94a3b8; }
+    .after .dot { background: var(--green); }
+
+    .method {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      max-width: 1240px;
+    }
+
+    .method-card {
+      min-height: 218px;
+      padding: 20px 18px;
+      border: 1px solid rgba(45,125,204,.16);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 10px 24px rgba(18, 52, 95, .08);
+    }
+
+    .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      margin-bottom: 15px;
+      border-radius: 50%;
+      color: #fff;
+      background: linear-gradient(135deg, #1762ad, #2d7dcc);
+      font-weight: 900;
+    }
+
+    .method-card h3 {
+      min-height: 56px;
+      color: var(--blue-900);
+      font-size: 20px;
+    }
+
+    .method-card p {
+      margin-top: 8px;
+      color: #53657c;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .placeholder-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 1120px;
+    }
+
+    .placeholder {
+      min-height: 138px;
+      display: grid;
+      place-items: center;
+      border: 1px dashed rgba(45, 125, 204, .35);
+      border-radius: var(--radius);
+      color: #6380a3;
+      background: rgba(234, 244, 255, .62);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .ai-demo-layout {
+      display: grid;
+      grid-template-columns: .58fr 1.42fr;
+      gap: 22px;
+      max-width: 1180px;
+      align-items: stretch;
+    }
+
+    .ai-demo-card {
+      padding: 24px 24px 20px;
+      border: 1px solid rgba(45, 125, 204, .24);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(234,244,255,.92), rgba(255,255,255,.82));
+      box-shadow: 0 14px 30px rgba(18, 52, 95, .08);
+    }
+
+    .ai-demo-label {
+      display: inline-flex;
+      margin-bottom: 14px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(45, 125, 204, .12);
+      color: var(--blue-700);
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .ai-demo-card p {
+      margin: 0 0 14px;
+      color: #173a65;
+      font-size: 19px;
+      line-height: 1.7;
+    }
+
+    .ai-shot {
+      margin: 0;
+      padding: 0;
+    }
+
+    .ai-shot img {
+      display: block;
+      width: 100%;
+      border: 1px solid rgba(45, 125, 204, .2);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: 0 18px 34px rgba(18, 52, 95, .12);
+    }
+
+    .ai-shot figcaption {
+      margin-top: 8px;
+      color: #607590;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    #s13 .content {
+      justify-content: center;
+      gap: clamp(10px, 1.5vh, 18px);
+      padding-top: clamp(0px, 1.2vh, 18px);
+    }
+
+    #s13 h2 {
+      font-size: clamp(38px, 2.9vw, 56px);
+      line-height: 1.08;
+    }
+
+    #s13 .text {
+      max-width: 1280px;
+    }
+
+    #s13 .text p {
+      font-size: clamp(18px, 1.15vw, 22px);
+      line-height: 1.42;
+    }
+
+    #s13 .text p + p {
+      margin-top: 7px;
+    }
+
+    #s13 .two-col {
+      max-width: 1320px;
+      gap: 28px;
+      grid-template-columns: 1.08fr .92fr;
+    }
+
+    #s13 .placeholder {
+      min-height: clamp(250px, 29vh, 310px);
+    }
+
+    #s13 .panel {
+      min-height: clamp(250px, 29vh, 310px);
+      padding: clamp(18px, 2.3vh, 28px) clamp(22px, 1.7vw, 32px);
+    }
+
+    #s13 .steps {
+      gap: 13px;
+      margin-top: 20px;
+    }
+
+    #s13 .steps li {
+      min-height: clamp(38px, 4.7vh, 50px);
+      padding: clamp(7px, 1vh, 10px) 16px;
+      font-size: clamp(16px, 1vw, 19px);
+    }
+
+    #s13 .quote {
+      max-width: 1080px;
+      padding: clamp(10px, 1.4vh, 16px) 24px;
+      font-size: clamp(21px, 1.45vw, 28px);
+      line-height: 1.22;
+    }
+
+    #s3 .content {
+      justify-content: center;
+      gap: clamp(10px, 1.5vh, 16px);
+      padding-top: 0;
+    }
+
+    #s3 h2 {
+      max-width: 1180px;
+      font-size: clamp(36px, 2.7vw, 50px);
+      line-height: 1.08;
+    }
+
+    #s3 .media-frame {
+      max-width: 1120px;
+      gap: 24px;
+      grid-template-columns: 1.55fr .85fr;
+    }
+
+    #s3 .video-placeholder {
+      min-height: clamp(260px, 34vh, 360px);
+    }
+
+    #s3 .quote {
+      display: none;
+    }
+
+    #s11 .content,
+    #s15 .content {
+      justify-content: center !important;
+      gap: clamp(8px, 1.1vh, 12px);
+      padding-top: 0 !important;
+    }
+
+    #s11 h2,
+    #s15 h2 {
+      font-size: clamp(34px, 2.65vw, 50px);
+      line-height: 1.08;
+    }
+
+    #s11 .text p,
+    #s15 .text p {
+      font-size: 22px;
+      line-height: 1.32;
+    }
+
+    #s11 .text p + p,
+    #s15 .text p + p {
+      margin-top: 4px;
+    }
+
+    #s11 .screenshot-gallery,
+    #s15 .screenshot-gallery {
+      max-width: 1140px;
+      gap: 16px;
+    }
+
+    #s11 .screenshot-card img,
+    #s15 .screenshot-card img {
+      height: clamp(174px, 21vh, 204px);
+      aspect-ratio: auto;
+    }
+
+    #s11 .quote,
+    #s15 .quote {
+      max-width: 1140px;
+      padding: 14px 24px;
+      font-size: clamp(22px, 1.7vw, 30px);
+      line-height: 1.24;
+    }
+
+    #s9 .content {
+      justify-content: center !important;
+      gap: clamp(9px, 1.25vh, 15px);
+      padding-top: clamp(22px, 2.8vh, 32px);
+    }
+
+    #s9 h2 {
+      font-size: clamp(32px, 2.45vw, 46px);
+      line-height: 1.08;
+    }
+
+    #s9 .text p {
+      font-size: 22px;
+      line-height: 1.42;
+    }
+
+    #s9 .text p + p {
+      margin-top: 8px;
+    }
+
+    #s9 .screenshot-gallery {
+      max-width: 1120px;
+      gap: 24px;
+    }
+
+    #s9 .screenshot-card img {
+      height: clamp(174px, 21vh, 204px);
+      aspect-ratio: auto;
+    }
+
+    #s9 .quote {
+      max-width: 1120px;
+      padding: 14px 24px;
+      font-size: clamp(22px, 1.7vw, 30px);
+      line-height: 1.24;
+    }
+
+    #s13 .content {
+      justify-content: center !important;
+      gap: clamp(7px, 1vh, 11px);
+      padding-top: 0 !important;
+    }
+
+    #s13 h2 {
+      font-size: clamp(34px, 2.55vw, 48px);
+    }
+
+    #s13 .two-col {
+      max-width: 1000px;
+      gap: 20px;
+      grid-template-columns: 1fr .9fr;
+    }
+
+    #s13 .screenshot-card img {
+      height: clamp(220px, 27vh, 260px);
+      aspect-ratio: auto;
+    }
+
+    #s13 .panel {
+      min-height: 0;
+      padding: 18px 22px;
+    }
+
+    #s13 .steps {
+      gap: 9px;
+      margin-top: 14px;
+    }
+
+    #s13 .steps li {
+      min-height: 36px;
+      padding: 7px 13px;
+      font-size: 20px;
+    }
+
+    #s13 .text p {
+      font-size: 22px;
+      line-height: 1.34;
+    }
+
+    #s13 .quote {
+      max-width: 1080px;
+      padding: 14px 24px;
+      font-size: clamp(22px, 1.7vw, 30px);
+      line-height: 1.24;
+    }
+
+    #s4 .content {
+      justify-content: center;
+      gap: clamp(16px, 2.6vh, 28px);
+      padding-top: 0;
+    }
+
+    #s4 h2 {
+      max-width: 1020px;
+      font-size: clamp(44px, 3.35vw, 64px);
+      line-height: 1.08;
+    }
+
+    #s4 .text {
+      max-width: 1320px;
+      font-size: clamp(21px, 1.45vw, 28px);
+      line-height: 1.48;
+    }
+
+    #s4 .flow {
+      max-width: 1420px;
+      margin-top: 0;
+    }
+
+    #s4 .flow-card {
+      min-height: clamp(72px, 8.9vh, 96px);
+      padding: clamp(12px, 1.7vh, 18px) 16px;
+      font-size: clamp(17px, 1.1vw, 21px);
+    }
+
+    #s4 .quote {
+      max-width: 1280px;
+      padding: clamp(13px, 1.9vh, 20px) 28px;
+      font-size: clamp(23px, 1.65vw, 32px);
+      line-height: 1.26;
+    }
+
+    #s20 .content {
+      max-width: 1460px;
+      justify-content: center;
+      gap: clamp(10px, 1.4vh, 16px);
+      padding-top: clamp(0px, 1.5vh, 16px);
+    }
+
+    #s20 h2 {
+      max-width: 1120px;
+      font-size: clamp(34px, 2.7vw, 50px);
+      line-height: 1.12;
+      margin-bottom: 0;
+    }
+
+    #s20 .ai-breakdown-layout {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 28px;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    #s20 .ai-prompt-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 2px;
+    }
+
+    #s20 .text p {
+      max-width: 360px;
+      font-size: clamp(18px, 1.13vw, 22px);
+      line-height: 1.42;
+    }
+
+    #s20 .prompt-steps {
+      display: grid;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    #s20 .prompt-step {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 11px;
+      align-items: start;
+      min-height: clamp(50px, 5.8vh, 64px);
+      padding: clamp(9px, 1.2vh, 13px) 16px;
+      border: 1px solid rgba(45, 125, 204, .18);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .78);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.86);
+    }
+
+    #s20 .prompt-step .num {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-700), #34a2a6);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 850;
+    }
+
+    #s20 .prompt-step strong {
+      display: block;
+      color: var(--blue-900);
+      font-size: clamp(18px, 1.15vw, 22px);
+      line-height: 1.18;
+      margin-bottom: 3px;
+    }
+
+    #s20 .prompt-step span {
+      display: block;
+      color: #3d5878;
+      font-size: clamp(14px, .9vw, 17px);
+      line-height: 1.3;
+      font-weight: 600;
+    }
+
+    #s20 .ai-workbench {
+      min-height: 0;
+      border: 1px solid rgba(45, 125, 204, .22);
+      border-radius: 10px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,252,255,.92)),
+        radial-gradient(circle at 82% 8%, rgba(45,125,204,.16), transparent 34%);
+      box-shadow: 0 18px 38px rgba(18, 52, 95, .10);
+      overflow: hidden;
+    }
+
+    #s20 .ai-window-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 42px;
+      padding: 0 22px;
+      background: linear-gradient(90deg, #eef6ff, #f8fbff);
+      border-bottom: 1px solid rgba(45, 125, 204, .14);
+      color: var(--blue-900);
+      font-size: clamp(16px, 1vw, 20px);
+      font-weight: 850;
+    }
+
+    #s20 .ai-window-bar i {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef6b6b;
+    }
+
+    #s20 .ai-window-bar i:nth-child(2) {
+      background: #f5c04e;
+    }
+
+    #s20 .ai-window-bar i:nth-child(3) {
+      background: #3bb273;
+      margin-right: 8px;
+    }
+
+    #s20 .ai-workbench-grid {
+      display: grid;
+      grid-template-columns: minmax(220px, 31%) 56px minmax(0, 1fr);
+      gap: 14px;
+      padding: clamp(12px, 1.5vh, 16px);
+      align-items: stretch;
+    }
+
+    #s20 .ai-input-card,
+    #s20 .ai-output-card {
+      border: 1px solid rgba(45, 125, 204, .2);
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.95);
+    }
+
+    #s20 .ai-input-card {
+      padding: 15px 18px;
+      background: linear-gradient(180deg, #fbfdff, #f4f9ff);
+    }
+
+    #s20 .ai-input-card h3,
+    #s20 .ai-output-card h3 {
+      margin: 0 0 9px;
+      color: var(--blue-900);
+      font-size: clamp(17px, 1.08vw, 21px);
+      line-height: 1.18;
+    }
+
+    #s20 .ai-input-card p {
+      margin: 0 0 9px;
+      color: #254462;
+      font-size: clamp(13px, .82vw, 16px);
+      line-height: 1.36;
+      font-weight: 600;
+    }
+
+    #s20 .ai-chip {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--blue-700), #28a7a0);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 850;
+    }
+
+    #s20 .ai-connector {
+      display: grid;
+      place-items: center;
+      color: var(--blue-700);
+    }
+
+    #s20 .ai-connector::before {
+      content: "";
+      width: 42px;
+      height: 42px;
+      border-top: 4px solid currentColor;
+      border-right: 4px solid currentColor;
+      transform: rotate(45deg);
+      border-radius: 3px;
+    }
+
+    #s20 .ai-output-card {
+      padding: 15px 18px 14px;
+    }
+
+    #s20 .answer-callout {
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #eaf4ff, #f3f9ff);
+      color: var(--blue-900);
+      font-size: clamp(14px, .88vw, 17px);
+      line-height: 1.25;
+      font-weight: 850;
+    }
+
+    #s20 .answer-callout small {
+      display: block;
+      margin-top: 3px;
+      color: #4c6684;
+      font-size: clamp(11px, .72vw, 14px);
+      font-weight: 650;
+    }
+
+    #s20 .answer-steps {
+      display: grid;
+      gap: 6px;
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    #s20 .answer-steps li {
+      display: grid;
+      grid-template-columns: 28px 108px 1fr;
+      gap: 10px;
+      align-items: center;
+      min-height: 34px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: #f6fbff;
+      color: #426288;
+      font-size: clamp(11px, .72vw, 14px);
+      line-height: 1.25;
+      font-weight: 650;
+    }
+
+    #s20 .answer-steps b:first-child {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--blue-700);
+      color: #fff;
+      font-size: 14px;
+    }
+
+    #s20 .answer-steps b:nth-child(2) {
+      color: var(--blue-900);
+      font-size: clamp(13px, .82vw, 16px);
+    }
+
+    #s20 .ai-route-note {
+      margin: 0 clamp(12px, 1.5vh, 16px) clamp(10px, 1.3vh, 14px);
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: rgba(234,244,255,.7);
+      color: var(--blue-900);
+      font-size: clamp(13px, .82vw, 16px);
+      line-height: 1.3;
+      font-weight: 800;
+    }
+
+    #s20 .quote {
+      max-width: 1300px;
+      margin-top: 0;
+      padding: clamp(16px, 2vh, 22px) 28px;
+      font-size: clamp(23px, 1.65vw, 32px);
+      line-height: 1.26;
+    }
+
+    .media-frame {
+      display: grid;
+      grid-template-columns: 1.45fr .9fr;
+      gap: 26px;
+      max-width: 1280px;
+      align-items: stretch;
+    }
+
+    .video-placeholder {
+      position: relative;
+      min-height: 510px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid rgba(45, 125, 204, .24);
+      border-radius: 10px;
+      background:
+        linear-gradient(135deg, rgba(18,52,95,.94), rgba(45,125,204,.78)),
+        linear-gradient(180deg, rgba(255,255,255,.12), transparent);
+      color: #fff;
+      box-shadow: 0 18px 42px rgba(18, 52, 95, .16);
+    }
+
+    .demo-video {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: none;
+      width: 100%;
+      height: 100%;
+      background: #12345f;
+      object-fit: contain;
+    }
+
+    .video-placeholder.has-video .demo-video {
+      display: block;
+    }
+
+    .video-placeholder.has-video {
+      min-height: 0;
+      display: block;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .video-placeholder.has-video .demo-video {
+      position: relative;
+      inset: auto;
+      width: 100%;
+      height: auto;
+      background: transparent;
+      object-fit: fill;
+    }
+
+    .video-placeholder.has-video::before,
+    .video-placeholder.has-video::after,
+    .video-placeholder.has-video .media-caption {
+      display: none;
+    }
+
+    .video-placeholder::before {
+      content: "";
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.42);
+      box-shadow: inset 0 0 0 22px rgba(255,255,255,.04);
+    }
+
+    .video-placeholder::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 0;
+      height: 0;
+      border-top: 16px solid transparent;
+      border-bottom: 16px solid transparent;
+      border-left: 24px solid #fff;
+      transform: translate(-34%, -50%);
+    }
+
+    .media-caption {
+      position: absolute;
+      left: 26px;
+      right: 26px;
+      bottom: 24px;
+      display: grid;
+      gap: 6px;
+      color: rgba(255,255,255,.92);
+      font-size: 16px;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .media-caption small {
+      color: rgba(255,255,255,.7);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .iteration-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: transparent;
+      border: 0;
+    }
+
+    .iteration-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 12px;
+      align-items: start;
+      min-height: 68px;
+      padding: 10px 12px;
+      border-radius: 7px;
+      border: 1px solid rgba(45, 125, 204, .16);
+      background: rgba(246, 251, 255, .94);
+    }
+
+    .iteration-copy {
+      display: grid;
+      gap: 4px;
+    }
+
+    .iteration-item strong {
+      display: block;
+      color: var(--blue-900);
+      font-size: 16px;
+      line-height: 1.25;
+      font-weight: 850;
+    }
+
+    .iteration-item span {
+      display: block;
+      color: #5f7188;
+      font-size: 13px;
+      line-height: 1.48;
+      font-weight: 500;
+    }
+
+    .iteration-item .iteration-mark {
+      display: inline-grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      color: #fff;
+      background: linear-gradient(135deg, #1762ad, #2d7dcc);
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1;
+      box-shadow: 0 8px 18px rgba(45, 125, 204, .18);
+    }
+
+    .video-showcase .content {
+      justify-content: center;
+      gap: clamp(12px, 1.7vh, 20px);
+      padding-top: 4px;
+    }
+
+    .video-showcase h2 {
+      max-width: 1240px;
+      font-size: clamp(34px, 2.9vw, 54px);
+      line-height: 1.08;
+    }
+
+    .video-showcase .media-frame {
+      grid-template-columns: 1.68fr .72fr;
+      gap: 24px;
+      max-width: 1340px;
+    }
+
+    .video-showcase .video-placeholder {
+      min-height: clamp(360px, 50vh, 540px);
+    }
+
+    .video-showcase .video-placeholder.has-video,
+    #s3 .video-placeholder.has-video {
+      min-height: 0;
+    }
+
+    .video-showcase .iteration-list {
+      align-content: center;
+      gap: 12px;
+    }
+
+    .video-showcase .iteration-item {
+      min-height: 92px;
+      padding: 15px 14px;
+    }
+
+    .video-showcase .iteration-item strong {
+      font-size: 18px;
+    }
+
+    .video-showcase .iteration-item span {
+      font-size: 15px;
+    }
+
+    .agenda-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 1120px;
+    }
+
+    .agenda-card {
+      min-height: 230px;
+      padding: 22px;
+      border: 1px solid rgba(45,125,204,.16);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 12px 28px rgba(18, 52, 95, .08);
+    }
+
+    .time-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      margin-bottom: 18px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: var(--blue-800);
+      background: var(--blue-100);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .agenda-card h3 {
+      min-height: 58px;
+      color: var(--blue-900);
+      font-size: 21px;
+    }
+
+    .agenda-card p {
+      margin-top: 10px;
+      color: #53657c;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .iteration-table {
+      display: grid;
+      gap: 10px;
+      max-width: 1120px;
+    }
+
+    .iteration-row {
+      display: grid;
+      grid-template-columns: 130px 1fr 1fr 1fr;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .iteration-row > div {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      border: 1px solid rgba(45, 125, 204, .12);
+      border-radius: 7px;
+      background: rgba(255,255,255,.9);
+      color: #344963;
+      font-size: 15px;
+      line-height: 1.4;
+      font-weight: 650;
+    }
+
+    .iteration-row.header > div {
+      min-height: 42px;
+      color: var(--blue-900);
+      background: var(--blue-100);
+      font-weight: 850;
+    }
+
+    .iteration-row .phase {
+      color: #fff;
+      background: var(--blue-700);
+      border-color: var(--blue-700);
+      font-weight: 850;
+    }
+
+    .iteration-row .change {
+      border-color: rgba(33,166,122,.22);
+      background: rgba(238,251,247,.92);
+    }
+
+    .why-how {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      max-width: 1080px;
+    }
+
+    .why-how-card {
+      padding: 24px;
+      border: 1px solid rgba(45, 125, 204, .16);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.92);
+    }
+
+    .why-how-card strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--blue-900);
+      font-size: 24px;
+      font-weight: 850;
+    }
+
+    .why-how-card p {
+      color: #405875;
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      max-width: 1120px;
+    }
+
+    .timeline .flow-card {
+      min-height: 70px;
+      font-size: 15px;
+    }
+
+    .cover .content {
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 10px;
+    }
+
+    .cover-art {
+      position: absolute;
+      right: 72px;
+      bottom: 74px;
+      width: 34%;
+      min-width: 340px;
+      height: 44%;
+      border: 1px solid rgba(45,125,204,.16);
+      border-radius: 12px;
+      background:
+        linear-gradient(135deg, rgba(45,125,204,.18), rgba(30,87,148,.12)),
+        linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.22));
+      box-shadow: 0 24px 54px rgba(18, 52, 95, .14);
+      overflow: hidden;
+    }
+
+    .cover-art::before,
+    .cover-art::after {
+      content: "";
+      position: absolute;
+      border: 2px solid rgba(45,125,204,.38);
+      border-radius: 8px;
+    }
+
+    .cover-art::before {
+      left: 44px;
+      top: 48px;
+      width: 145px;
+      height: 82px;
+      box-shadow: 170px 96px 0 -2px rgba(255,255,255,.0), 170px 96px 0 0 rgba(25,169,116,.36);
+    }
+
+    .cover-art::after {
+      right: 58px;
+      top: 64px;
+      width: 112px;
+      height: 162px;
+      border-color: rgba(45,125,204,.42);
+    }
+
+    .cover h1 { max-width: 900px; }
+
+    .speaker {
+      color: #49627f;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .accent-line {
+      width: 76px;
+      height: 5px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--blue-700), var(--green));
+    }
+
+    @media (max-width: 900px) {
+      .deck-nav, .deck-controls { display: none; }
+
+      html {
+        scroll-snap-type: none;
+        overflow-y: auto;
+      }
+
+      body {
+        width: 100%;
+        min-height: auto;
+        display: block;
+        padding: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+      .slide {
+        width: 100%;
+        height: auto;
+        flex-basis: auto;
+        min-height: auto;
+        max-height: none;
+        aspect-ratio: auto;
+        margin: 0 0 18px;
+        padding: 74px 22px 96px;
+      }
+
+      .logo { left: 20px; top: 22px; }
+      .cover .logo { left: 22px; top: 24px; }
+      .page-no { right: 22px; top: 30px; }
+      .notes {
+        left: 22px;
+        right: 22px;
+        grid-template-columns: 1fr;
+      }
+
+      .flow, .two-col, .method, .timeline, .placeholder-grid, .screenshot-gallery, .media-frame, .agenda-grid, .why-how, .ai-demo-layout, #s20 .ai-breakdown-layout, #s20 .ai-workbench-grid {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+
+      .slide-proof-row,
+      .inline-proof-row {
+        grid-template-columns: 1fr;
+      }
+
+      .screenshot-gallery.compact-four {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .screenshot-gallery.compact-proof {
+        max-width: none;
+      }
+
+      .video-showcase .content {
+        height: auto;
+      }
+
+      .video-showcase .media-frame,
+      #s3 .media-frame {
+        grid-template-columns: 1fr;
+      }
+
+      .video-showcase .video-placeholder,
+      #s3 .video-placeholder {
+        min-height: 260px;
+      }
+
+      .video-showcase .video-placeholder.has-video,
+      #s3 .video-placeholder.has-video {
+        min-height: 0;
+      }
+
+      .video-showcase .iteration-list {
+        gap: 8px;
+      }
+
+      .video-showcase .iteration-item {
+        min-height: auto;
+        padding: 12px;
+      }
+
+      #s20 .ai-connector {
+        min-height: 24px;
+      }
+
+      #s20 .ai-connector::before {
+        transform: rotate(135deg);
+      }
+
+      #s20 .answer-steps li {
+        grid-template-columns: 28px 1fr;
+      }
+
+      #s20 .answer-steps li span {
+        grid-column: 2;
+      }
+
+      .iteration-list { grid-template-columns: 1fr; }
+      .iteration-row { grid-template-columns: 1fr; }
+
+      .flow-card::after { display: none; }
+      .method-card { min-height: auto; }
+      .method-card h3 { min-height: auto; }
+      .cover-art { display: none; }
+      .video-placeholder { min-height: 260px; }
+    }
+
+    @media print {
+      @page {
+        size: 16in 9in;
+        margin: 0;
+      }
+
+      html, body {
+        width: 100%;
+        background: #fff;
+        display: block;
+        min-height: auto;
+        padding: 0;
+        overflow: visible;
+      }
+
+      .deck-nav, .deck-controls { display: none; }
+
+      .slide {
+        width: 16in;
+        height: 9in;
+        flex-basis: auto;
+        min-height: 9in;
+        max-height: none;
+        margin: 0;
+        box-shadow: none;
+        border: none;
+        overflow: hidden;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+    }
+
+    /* Polished module layer: keeps the original blue-white HTMLPPT direction,
+       while making repeated blocks feel more like finished PPT components. */
+    .slide { isolation: isolate; }
+
+    .page-no {
+      min-width: 72px;
+      padding: 5px 10px;
+      border: 1px solid rgba(45,125,204,.16);
+      border-radius: 999px;
+      background: rgba(255,255,255,.62);
+      box-shadow: 0 10px 24px rgba(18,52,95,.08);
+      text-align: center;
+      backdrop-filter: blur(12px);
+    }
+
+    .stage-kicker,
+    .eyebrow {
+      position: relative;
+      box-shadow: 0 8px 22px rgba(18,52,95,.07);
+    }
+
+    .stage-kicker::before,
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      margin-right: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 5px rgba(33,166,122,.10);
+    }
+
+    .slide:not(.cover) h2 {
+      position: relative;
+      max-width: 1180px;
+    }
+
+    .slide:not(.cover) h2::after {
+      content: "";
+      display: block;
+      width: 96px;
+      height: 6px;
+      margin-top: 16px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--blue-700), var(--green));
+      box-shadow: 0 8px 18px rgba(45,125,204,.18);
+    }
+
+    .quote {
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 16px 38px rgba(18,52,95,.08);
+    }
+
+    .quote::before {
+      content: "KEY";
+      position: absolute;
+      right: 16px;
+      bottom: 8px;
+      color: rgba(45,125,204,.14);
+      font-size: 40px;
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: .06em;
+      pointer-events: none;
+    }
+
+    .quote::after {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 6px;
+      background: linear-gradient(180deg, var(--blue-700), var(--green));
+    }
+
+    .flow { align-items: stretch; }
+
+    .flow-card {
+      overflow: hidden;
+      padding-top: 26px;
+      box-shadow: 0 14px 34px rgba(18,52,95,.075);
+    }
+
+    .flow-card::before {
+      content: attr(data-step);
+      position: absolute;
+      left: 14px;
+      top: 10px;
+      color: rgba(45,125,204,.16);
+      font-size: 34px;
+      font-weight: 950;
+      line-height: 1;
+    }
+
+    .flow-card,
+    .method-card,
+    .panel,
+    .placeholder {
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    }
+
+    .flow-card:hover,
+    .method-card:hover,
+    .panel:hover,
+    .placeholder:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 42px rgba(18,52,95,.11);
+    }
+
+    .placeholder {
+      position: relative;
+      overflow: hidden;
+      min-height: 210px;
+      display: grid;
+      place-items: center;
+      padding: 34px 28px 28px;
+      border-style: dashed;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.92), rgba(234,244,255,.72)),
+        radial-gradient(circle at 84% 18%, rgba(45,125,204,.13), transparent 9rem);
+      text-align: center;
+    }
+
+    .placeholder::before {
+      content: "SCREENSHOT";
+      position: absolute;
+      left: 20px;
+      top: 16px;
+      color: rgba(45,125,204,.45);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: .12em;
+    }
+
+    .placeholder::after {
+      content: "";
+      position: absolute;
+      right: 20px;
+      top: 18px;
+      width: 42px;
+      height: 30px;
+      border: 2px solid rgba(45,125,204,.22);
+      border-radius: 6px;
+      box-shadow: inset 0 -8px 0 rgba(33,166,122,.10);
+    }
+
+    #s7 .content {
+      gap: clamp(10px, 1.45vh, 18px);
+    }
+
+    #s7 h2 {
+      font-size: clamp(36px, 3vw, 56px);
+    }
+
+    #s7 .text {
+      max-width: 1320px;
+    }
+
+    #s7 .text p {
+      font-size: clamp(16px, 1.12vw, 21px);
+      line-height: 1.4;
+    }
+
+    #s7 .text p + p {
+      margin-top: 7px;
+    }
+
+    #s7 .screenshot-gallery {
+      max-width: 1160px;
+      gap: 16px;
+    }
+
+    #s7 .screenshot-card img {
+      height: clamp(174px, 21vh, 204px);
+      aspect-ratio: auto;
+    }
+
+    .screenshot-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      max-width: 1320px;
+    }
+
+    .screenshot-gallery.single {
+      grid-template-columns: 1fr;
+    }
+
+    .slide-proof-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.28fr) minmax(360px, .72fr);
+      gap: 22px;
+      max-width: 1320px;
+      align-items: start;
+    }
+
+    .slide-proof-row .text,
+    .inline-proof-row .text {
+      max-width: none;
+    }
+
+    .screenshot-gallery.compact-four {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      max-width: none;
+    }
+
+    .inline-proof-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 440px);
+      gap: 22px;
+      max-width: 1320px;
+      align-items: start;
+    }
+
+    .screenshot-gallery.compact-proof {
+      max-width: 440px;
+    }
+
+    .screenshot-card {
+      position: relative;
+      display: block;
+      overflow: hidden;
+      align-self: start;
+      min-height: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      cursor: zoom-in;
+      transition: transform .2s ease;
+    }
+
+    .screenshot-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .screenshot-card img {
+      display: block;
+      width: 100%;
+      height: auto !important;
+      aspect-ratio: auto !important;
+      object-fit: contain;
+      object-position: top left;
+      background: #fff;
+      border: 1px solid rgba(45, 125, 204, .22);
+      border-radius: var(--radius) var(--radius) 0 0;
+      box-shadow: 0 12px 28px rgba(18, 52, 95, .10);
+    }
+
+    .screenshot-gallery.compact-four .screenshot-card img,
+    .screenshot-gallery.compact-proof .screenshot-card img {
+      object-fit: contain;
+      background: #f8fbff;
+    }
+
+    .screenshot-gallery.compact-four .screenshot-card img {
+      height: 116px !important;
+      object-fit: cover;
+      object-position: top left;
+    }
+
+    .screenshot-gallery.compact-four .screenshot-card span {
+      min-height: 30px;
+      gap: 6px;
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+
+    .screenshot-gallery.compact-four .screenshot-card span::after {
+      font-size: 10px;
+    }
+
+    .screenshot-card.is-missing::before {
+      content: "等待截图文件";
+      display: grid;
+      min-height: 164px;
+      place-items: center;
+      color: #6f88a8;
+      background: linear-gradient(135deg, rgba(255,255,255,.94), rgba(234,244,255,.78));
+      font-size: 17px;
+      font-weight: 850;
+    }
+
+    .screenshot-card.is-missing img {
+      display: none;
+    }
+
+    .screenshot-card span {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px;
+      border: 1px solid rgba(45, 125, 204, .22);
+      border-top: 0;
+      border-radius: 0 0 var(--radius) var(--radius);
+      color: var(--blue-900);
+      background: linear-gradient(90deg, rgba(234,244,255,.96), rgba(255,255,255,.96));
+      font-size: 15px;
+      font-weight: 850;
+    }
+
+    .screenshot-card span::after {
+      content: "点击放大";
+      color: var(--blue-700);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .image-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      background: rgba(5, 18, 36, .86);
+      backdrop-filter: blur(8px);
+    }
+
+    .image-lightbox.is-open {
+      display: flex;
+    }
+
+    .image-lightbox img {
+      max-width: min(94vw, 1800px);
+      max-height: 88vh;
+      border: 1px solid rgba(255,255,255,.42);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 26px 72px rgba(0,0,0,.34);
+    }
+
+    .image-lightbox button {
+      position: absolute;
+      right: 24px;
+      top: 20px;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255,255,255,.42);
+      border-radius: 50%;
+      color: #fff;
+      background: rgba(255,255,255,.12);
+      font-size: 26px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .method { align-items: stretch; }
+
+    .method-card {
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 14px 34px rgba(18,52,95,.075);
+    }
+
+    .method-card::after {
+      content: "";
+      position: absolute;
+      right: -28px;
+      top: -28px;
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(45,125,204,.12), transparent 68%);
+    }
+
+    .method-card .num {
+      display: inline-grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      color: #fff;
+      background: linear-gradient(135deg, var(--blue-700), var(--green));
+      font-size: 18px;
+      box-shadow: 0 10px 22px rgba(45,125,204,.20);
+    }
+
+    .panel {
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 14px 34px rgba(18,52,95,.075);
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--blue-700), transparent);
+      opacity: .55;
+    }
+
+    .panel.after::before {
+      background: linear-gradient(90deg, var(--green), transparent);
+    }
+
+    .steps li {
+      position: relative;
+      background: rgba(255,255,255,.72);
+      border-radius: 10px;
+      box-shadow: 0 8px 18px rgba(18,52,95,.055);
+    }
+
+    .video-placeholder {
+      overflow: hidden;
+      box-shadow: 0 22px 52px rgba(18,52,95,.10);
+    }
+
+    .video-placeholder .media-caption {
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      box-shadow: 0 12px 28px rgba(18,52,95,.10);
+      backdrop-filter: blur(12px);
+    }
+
+    .cover-art {
+      box-shadow: 0 24px 68px rgba(18,52,95,.12);
+    }
+
+    .cover-art::before,
+    .cover-art::after {
+      box-shadow: 0 16px 42px rgba(18,52,95,.08);
+    }
+
+    @media screen and (prefers-reduced-motion: no-preference) {
+      .motion-ready .slide [data-reveal] {
+        opacity: 0;
+        transform: translateY(18px) scale(.985);
+        filter: blur(3px);
+        transition:
+          opacity .48s ease,
+          transform .52s cubic-bezier(.2,.8,.2,1),
+          filter .52s ease;
+        transition-delay: calc(var(--stagger, 0) * 46ms);
+      }
+
+      .motion-ready .slide.is-active [data-revealed="true"],
+      .motion-ready .slide.is-past [data-reveal] {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+
+      .motion-ready .slide.is-active::before {
+        animation: drift-grid 9s ease-in-out infinite alternate;
+      }
+
+      .motion-ready .slide.is-active .cover-art::before,
+      .motion-ready .slide.is-active .cover-art::after {
+        animation: float-ui 4.8s ease-in-out infinite alternate;
+      }
+
+      .motion-ready .slide.is-active .flow-card[data-revealed="true"]::before,
+      .motion-ready .slide.is-active .method-card[data-revealed="true"] .num {
+        animation: pulse-mark 1.4s ease-out both;
+      }
+
+      @keyframes drift-grid {
+        from { transform: translate3d(0,0,0); }
+        to { transform: translate3d(-10px, 6px, 0); }
+      }
+
+      @keyframes float-ui {
+        from { transform: translateY(0); }
+        to { transform: translateY(-8px); }
+      }
+
+      @keyframes pulse-mark {
+        0% { box-shadow: 0 0 0 0 rgba(45,125,204,.28); }
+        100% { box-shadow: 0 0 0 14px rgba(45,125,204,0); }
+      }
+    }
+
+    @media print {
+      .slide [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+<nav class="deck-nav" aria-label="页面目录"></nav>
+<div class="deck-controls" aria-label="演示控制">
+  <button type="button" data-action="prev" title="上一页 (←)">‹</button>
+  <span class="slide-status" aria-live="polite">01 / 26</span>
+  <button type="button" data-action="next" title="下一页 (→)">›</button>
+  <button type="button" data-action="fullscreen" title="全屏 (F) / 退出全屏 (G)">F</button>
+</div>
+
+  <section class="slide cover" id="s1">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="cover-art" aria-hidden="true"></div>
+    <div class="content">
+      <div class="eyebrow">蓝禾七点半</div>
+      <h1>如何拆解任务，让 AI 和工具替我们工作</h1>
+      <p class="subtitle">从导单案例出发，提炼可复用的业务优化方法</p>
+      <div class="accent-line"></div>
+      <p class="speaker">分享人：蜜蜂、橘子、小柴</p>
+      <div class="meta-row"><span class="tag">业务难点</span><span class="tag">任务拆解</span><span class="tag">场景复用</span></div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s2">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <h2>这次分享能给大家带来什么</h2>
+      <div class="text"><p>这次不是先讲某个工具有多厉害，而是先看一个日常流程：导单为什么会耗时，问题到底卡在复制、查询、核对，还是卡在吉客云需要的固定导入格式。</p><p>大家可以带走三件事：第一，怎么把人工流程看清楚；第二，怎么在原路走不通时换个方式看待问题，不再只模仿人工动作；第三，怎么把这套拆解方法迁移到其它平台和工作场景。</p></div>
+      
+      <div class="quote">给大家带来的不是一套固定流程，而是一种把重复业务拆清楚、换个角度重新设计、再逐步优化的方法。</div>
+    </div>
+  </section>
+
+
+  <section class="slide video-showcase" id="s3">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <div class="stage-kicker">最初版本 / 视频演示</div>
+      <h2>先给大家看一下：我们一开始是怎么导单的</h2>
+      
+      
+      <div class="media-frame">
+        <div class="video-placeholder">
+          <video class="demo-video" controls preload="metadata">
+            <source src="assets/第一版导单.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="iteration-list">
+          <div class="iteration-item"><span class="iteration-mark">01</span><div class="iteration-copy"><strong>最初流程</strong><span>整理订单信息，经过多步适配才能导入吉客云。</span></div></div>
+          <div class="iteration-item"><span class="iteration-mark">02</span><div class="iteration-copy"><strong>多步适配</strong><span>字段调整、格式转换、核对分拆，每次都要重复一遍。</span></div></div>
+          <div class="iteration-item"><span class="iteration-mark">03</span><div class="iteration-copy"><strong>耗时明显</strong><span>流程能跑，但靠人堆动作，时间和出错风险都高。</span></div></div>
+        </div>
+      </div>
+    
+    </div>
+  </section>
+
+
+  <section class="slide" id="s4">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <div class="stage-kicker">阶段 1 / 找痛点</div>
+      <h2>先把导单里的真实卡点讲清楚</h2>
+      <div class="slide-proof-row">
+        <div class="text"><p>导单最开始不是难在“不会做”，而是每一次都要把零散信息整理成吉客云能接收的格式。字段要对应，SKU 要核对，格式要调整，分拆规则也要处理。</p><p>以前即使把订单信息整理好了，导入吉客云前还要经过 1、2、3 步格式适配，才能变成吉客云需要的导入表。动作本身不复杂，但每天重复就会消耗时间，也容易出错。</p></div>
+        <div class="screenshot-gallery compact-four">
+          <button class="screenshot-card" type="button" data-lightbox-src="assets/manual-order-source.jpg" aria-label="放大查看原始订单信息截图">
+            <img src="assets/manual-order-source.jpg" alt="原始订单信息截图">
+            <span>转换格式表2 订单导入模板</span>
+          </button>
+          <button class="screenshot-card" type="button" data-lightbox-src="assets/manual-order-import.jpg" aria-label="放大查看导单表截图">
+            <img src="assets/manual-order-import.jpg" alt="导单表截图">
+            <span>转换格式表1 导单表</span>
+          </button>
+          <button class="screenshot-card" type="button" data-lightbox-src="assets/manual-sku-index.jpg" aria-label="放大查看 SKU 索引截图">
+            <img src="assets/manual-sku-index.jpg" alt="SKU 索引截图">
+            <span>转换格式表3 SKU 匹配表</span>
+          </button>
+          <button class="screenshot-card" type="button" data-lightbox-src="assets/manual-registration-table.jpg" aria-label="放大查看登记表截图">
+            <img src="assets/manual-registration-table.jpg" alt="登记表截图">
+            <span>补发登记表</span>
+          </button>
+        </div>
+      </div>
+      <div class="flow"><div class="flow-card">订单信息</div><div class="flow-card">SKU / 物料编码</div><div class="flow-card">字段对应</div><div class="flow-card">格式调整</div><div class="flow-card">吉客云导入表</div></div>
+      <div class="quote">这一步先不讲工具，先讲清楚：真正消耗人的，是反复把信息改成系统需要的格式。</div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s5">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <div class="stage-kicker">阶段 1 补充 / 选一个典型入口</div>
+      <h2>为什么从导单讲起</h2>
+      <div class="text"><p>因为导单足够日常，也足够典型。它不是一个“炫技”的技术问题，而是一个真实业务问题：流程能跑，但靠人堆动作；结果能出来，但中间容易慢、漏、错。</p><p>最典型的地方就是吉客云格式适配：之前整理好的信息，不能直接变成最终导入表，还需要一步、两步、三步去调整字段、转换格式、核对分拆规则。</p><p>这类问题不只存在于导单。只要一个工作里有固定字段、固定规则、固定输出，又经常靠人工转换，就可以用类似思路重新拆。</p></div>
+      
+      <div class="quote">导单是入口，真正要看见的是：重复格式转换和规则匹配，能不能被提前固定下来。</div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s6">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <div class="stage-kicker">阶段 2 / 拆动作</div>
+      <h2>还原人工导单里的 1、2、3 步</h2>
+      <div class="inline-proof-row">
+        <div class="text"><p>拆动作这个阶段最大的价值，不是马上动手自动化，而是把人工真实的操作步骤还原出来。</p><p>不要急着找工具，先把人工反复做的步骤拆清楚：哪些是整理信息，哪些是查询核对，哪些是格式转换。</p><p>只有把每一步都说得出来、能交代清楚，才知道哪一步值得先交给工具。</p></div>
+        <div class="screenshot-gallery single compact-proof">
+          <button class="screenshot-card" type="button" data-lightbox-src="assets/registration-table-optimization.png" aria-label="放大查看售后补发登记表优化截图">
+            <img src="assets/registration-table-optimization.png" alt="售后补发登记表优化截图">
+            <span>登记表优化</span>
+          </button>
+        </div>
+      </div>
+      <div class="flow"><div class="flow-card">整理订单信息</div><div class="flow-card">查询 SKU / 物料编码</div><div class="flow-card">步骤 1：字段调整</div><div class="flow-card">步骤 2：格式转换</div><div class="flow-card">步骤 3：核对后导入</div></div>
+      <div class="quote">第一步不是找工具，而是把人工的 1、2、3 步拆清楚。</div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s7">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <div class="stage-kicker">阶段 3A / 固定结构</div>
+      <h2>用多维表格固定吉客云格式</h2>
+      <div class="text"><p>后面我们开始用多维表格来承接导单信息。它的价值不只是换一个地方存信息，而是把吉客云需要的字段、格式、分拆规则提前固定下来。</p><p>这样一来，之前那些临时适配的动作，就尽量变成多维表格里的固定结构和固定规则，不再每次重新处理。</p><p>这一阶段还不能叫完全自动化，但它已经从”人每次改格式”，变成”表格提前固定格式”。这是后面继续自动化的基础。</p></div>
+      <div class="screenshot-gallery">
+        <button class="screenshot-card" type="button" data-lightbox-src="assets/registration-info.png" aria-label="放大查看登记信息截图">
+          <img src="assets/registration-info.png" alt="登记信息截图" onerror="this.closest('.screenshot-card').classList.add('is-missing')">
+          <span>登记信息</span>
+        </button>
+        <button class="screenshot-card" type="button" data-lightbox-src="assets/matched-info.png" aria-label="放大查看匹配好的信息截图">
+          <img src="assets/matched-info.png" alt="匹配好的信息截图" onerror="this.closest('.screenshot-card').classList.add('is-missing')">
+          <span>匹配好的信息</span>
+        </button>
+      </div>
+      <div class="quote">多维表格先解决的不是自动化，而是把吉客云需要的格式稳定下来。</div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s8">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <div class="stage-kicker">阶段 3B / 固定规则</div>
+      <h2>从多步适配到接近一步到位</h2>
+      <div class="inline-proof-row">
+        <div class="text"><p>这一步的变化很关键：我们不是一上来就追求自动导入，而是先把导入前最耗人的格式适配稳定下来。</p><p>通过多维表格，把字段关系、导入模板、分拆规则提前固定，导单表就更接近吉客云直接可用的状态。</p><p>格式稳定之后，后面影刀、AI 或其它自动化动作，才有可靠的数据入口去接住。</p></div>
+        <div class="screenshot-gallery single compact-proof">
+          <button class="screenshot-card" type="button" data-lightbox-src="assets/multidimensional-table-matching.jpg" aria-label="放大查看多维表格自动匹配截图">
+            <img src="assets/multidimensional-table-matching.jpg" alt="多维表格自动匹配截图">
+            <span>多维表格自动匹配</span>
+          </button>
+        </div>
+      </div>
+      <div class="flow"><div class="flow-card">原来：多步调整</div><div class="flow-card">字段关系固定</div><div class="flow-card">导入模板固定</div><div class="flow-card">分拆规则固定</div><div class="flow-card">现在：接近一步到位</div></div>
+      <div class="quote">先把格式固定，后面才谈得上让工具接住流程。</div>
+    </div>
+  </section>
+
+
+  <section class="slide video-showcase" id="s8-video">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      <div class="stage-kicker">阶段 3C / 视频演示</div>
+      <h2>用多维表格固定格式后，导单流程变成了什么样</h2>
+      <div class="media-frame">
+        <div class="video-placeholder">
+          <video class="demo-video" controls preload="metadata">
+            <source src="assets/第二版导单.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="iteration-list">
+          <div class="iteration-item"><span class="iteration-mark">01</span><div class="iteration-copy"><strong>多维表格承接</strong><span>字段、格式和分拆规则已经提前固定。</span></div></div>
+          <div class="iteration-item"><span class="iteration-mark">02</span><div class="iteration-copy"><strong>减少临时调整</strong><span>导单时不再反复做 1、2、3 步适配。</span></div></div>
+          <div class="iteration-item"><span class="iteration-mark">03</span><div class="iteration-copy"><strong>效率提升</strong><span>将第一版导单时长由1小时缩减至5分钟。</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s9">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <div class="stage-kicker">阶段 4A / 工具试跑</div>
+      <h2>影刀第一版，只接住单号推送</h2>
+      <div class="text"><p>格式稳定之后，我们开始尝试用影刀接住流程里的重复动作。</p><p>第一版真正跑通的，其实只是快递单号导出后的自动推送——范围不大，但证明了一件事：只要动作足够固定，就可以交给工具来做。</p><p>虽然这一版只接住了后半段一个小点，整体反响比较一般，但它是后面继续扩展影刀用途的起点。</p></div>
+      <div class="screenshot-gallery">
+        <button class="screenshot-card" type="button" data-lightbox-src="assets/yingdao-block-flow.png" aria-label="放大查看影刀第一版推送代码截图">
+          <img src="assets/yingdao-block-flow.png" alt="影刀第一版推送代码截图" onerror="this.closest('.screenshot-card').classList.add('is-missing')">
+          <span>影刀第一版推送代码</span>
+        </button>
+        <button class="screenshot-card" type="button" data-lightbox-src="assets/tracking-push-result.png" aria-label="放大查看单号推送结果截图">
+          <img src="assets/tracking-push-result.png" alt="单号推送结果截图" onerror="this.closest('.screenshot-card').classList.add('is-missing')">
+          <span>单号推送结果</span>
+        </button>
+      </div>
+      <div class="quote">第一版影刀只接住了“推送”，还没有真正接住导单。</div>
+    </div>
+  </section>
+
+
+  <section class="slide video-showcase" id="s9-video">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      <div class="stage-kicker">阶段 4A 补充 / 视频演示</div>
+      <h2>影刀推送单号演示</h2>
+      <div class="media-frame">
+        <div class="video-placeholder">
+          <video class="demo-video" controls preload="metadata">
+            <source src="assets/影刀第一版推送.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="iteration-list">
+          <div class="iteration-item"><span class="iteration-mark">01</span><div class="iteration-copy"><strong>第一版推送单号</strong><span>影刀第一版，负责快递单号导出后的自动推送。</span></div></div>
+          <div class="iteration-item"><span class="iteration-mark">02</span><div class="iteration-copy"><strong>固定动作交给影刀</strong><span>先把导出后的单号推送动作跑通。</span></div></div>
+          <div class="iteration-item"><span class="iteration-mark">03</span><div class="iteration-copy"><strong>先接住一个点</strong><span>虽然范围不大，但证明工具可以接住重复动作。</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s10">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <div class="stage-kicker">阶段 4B / 工具扩展</div>
+      <h2>开始尝试影刀自动导单</h2>
+      <div class="text"><p>完成单号推送后，下一步就想把影刀用到导单本身。</p><p>当时设想的流程是：影刀读取留存的电子表格，导入多维表格完成匹配，再导出本地 Excel，最后导入吉客云。</p><p>这个想法很符合人的直觉：既然人平时就是这么操作的，那工具是不是也可以照着做？但真正做的时候才发现，工具不一定能完全按照人的方式走完每一步。</p></div>
+      <div class="flow"><div class="flow-card">读取电子表格留存</div><div class="flow-card">导入多维表格匹配</div><div class="flow-card">导出本地 Excel</div><div class="flow-card">导入吉客云</div></div>
+      <div class="quote">第二版影刀的目标，才是真正开始接导单流程。</div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s11">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <div class="stage-kicker">阶段 4C / 卡点复盘</div>
+      <h2>自动导单卡在导出 Excel</h2>
+      <div class="text"><p>按照设想的四步流程推进时，卡在了”导出本地 Excel”这一步——影刀无法稳定完成这个动作。</p><p>如果继续沿着原路径硬做，成本会越来越高。这时候需要换一种思路：最终目标不是”必须让影刀导出 Excel”，而是拿到吉客云可以导入的文件，路径可以重新设计。</p><p>卡点本身不是问题，真正的问题是执着于原动作、不肯回到目标重新看。</p></div>
+      <div class="screenshot-gallery">
+        <button class="screenshot-card" type="button" data-lightbox-src="assets/export-excel-block.png" aria-label="放大查看导出 Excel 卡点截图">
+          <img src="assets/export-excel-block.png" alt="导出 Excel 卡点截图" onerror="this.closest('.screenshot-card').classList.add('is-missing')">
+          <span>卡点：导出 Excel</span>
+        </button>
+        <button class="screenshot-card" type="button" data-lightbox-src="assets/yingdao-v1-push-flow.png" aria-label="放大查看影刀流程截图">
+          <img src="assets/yingdao-v1-push-flow.png" alt="影刀流程截图" onerror="this.closest('.screenshot-card').classList.add('is-missing')">
+          <span>影刀流程</span>
+        </button>
+      </div>
+      <div class="quote">第一个卡点提醒我们：不要执着原动作，要回到最终目标重新拆。</div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s12">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <div class="stage-kicker">阶段 4D / 换路径</div>
+      <h2>绕开卡点，重新设计实现路径</h2>
+      <div class="text"><p>解决方案，是先绕开走不通的环节。既然影刀没办法稳定完成导出 Excel，那就不要让它硬走这一步。</p><p>我们改成直接复制需要导入吉客云的数据，先把吉客云导入格式固定下来，再按固定表头规则提取关键数据，生成本地 Excel 文件。</p><p>结果是：流程不再卡在影刀导出 Excel，而是变成一条更稳定、更容易复用的路径。</p></div>
+      <div class="flow"><div class="flow-card">复制需导入吉客云的数据</div><div class="flow-card">固定吉客云导入格式</div><div class="flow-card">提取关键数据</div><div class="flow-card">生成本地 Excel</div><div class="flow-card">导入吉客云</div></div>
+      <div class="quote">结果不是让工具照搬人工动作，而是重新设计一条更稳定的实现路径。</div>
+    </div>
+  </section>
+
+
+  <section class="slide video-showcase" id="s12-video">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      <div class="stage-kicker">阶段 4E / 视频演示</div>
+      <h2>后面实现了影刀的自动化导单</h2>
+      <div class="media-frame">
+        <div class="video-placeholder">
+          <video class="demo-video" controls preload="metadata">
+            <source src="assets/导单第一版.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="iteration-list">
+          <div class="iteration-item"><span class="iteration-mark">01</span><div class="iteration-copy"><strong>重新设计路径</strong><span>绕开不稳定的导出环节，把目标拆清楚。</span></div></div>
+          <div class="iteration-item"><span class="iteration-mark">02</span><div class="iteration-copy"><strong>自动化导单</strong><span>影刀开始真正接住导单本身。</span></div></div>
+          <div class="iteration-item"><span class="iteration-mark">03</span><div class="iteration-copy"><strong>全程自动完成</strong><span>从读取数据到生成 Excel，影刀完整接住导单流程。</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s13">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <div class="stage-kicker">阶段 5A / 新入口</div>
+      <h2>AI 登记软件</h2>
+      <div class="text"><p>导单的导入问题解决了，接下来自然会想到：售前登记这一步能不能也被解放出来？</p><p>我们发现登记这件事可以换一种做法：不再逐字手动填写，而是先复制剪贴板里的订单内容，再用 AI 按照固定规则自动识别并提取订单字段。</p><p>于是我们结合 AI 做了一个登记软件，让原来复制、整理、查询、匹配这些动作，变成一个更固定、更轻的入口。</p></div>
+      
+      <div class="two-col">
+        <button class="screenshot-card" type="button" data-lightbox-src="assets/registration-app.png" aria-label="放大查看 AI 登记软件界面截图">
+          <img src="assets/registration-app.png" alt="AI 登记软件界面截图" onerror="this.closest('.screenshot-card').classList.add('is-missing')">
+          <span>AI 登记软件界面</span>
+        </button>
+        <div class="panel after"><h3>登记软件做什么</h3><ul class="steps"><li><span class="dot"></span>读取剪贴板</li><li><span class="dot"></span>识别订单信息</li><li><span class="dot"></span>匹配 SKU</li><li><span class="dot"></span>写入多维表格</li></ul></div>
+      </div>
+    
+      <div class="quote">AI 和工具的价值，是把重复查询、复制、匹配变轻。</div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s14">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <div class="stage-kicker">阶段 5B / 新规则</div>
+      <h2>SKU 自动匹配</h2>
+      <div class="text"><p>当我们解决了快速读取剪贴板信息之后，新的问题又来了：怎么把订单里的 SKU 和物料编码匹配起来？</p><p>一开始也可以考虑做数据库，但数据库搭建和维护相对麻烦，会改、会维护的小伙伴比较少。为了让后续维护更简单，我们改成读取飞书多维表作为索引。</p><p>多维表更适合大家日常增删查改 SKU 和物料编码，也能被登记软件读取。这样不用维护复杂数据库，也能给后面的自动匹配打基础。</p></div>
+      <div class="flow"><div class="flow-card">飞书多维表维护索引</div><div class="flow-card">简单增删查改</div><div class="flow-card">登记软件读取</div><div class="flow-card">自动匹配 SKU 和物料编码</div><div class="flow-card">写入多维表格</div></div>
+      <div class="quote">不用一开始就做复杂数据库，先用大家能维护的多维表索引把匹配跑稳。</div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s15">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <div class="stage-kicker">阶段 5C / 新闭环</div>
+      <h2>影刀和登记软件形成闭环</h2>
+      <div class="text"><p>做到登记软件之后，还有一个问题：登记软件和影刀导单之间要真正接起来，不能只是各自少做一步。</p><p>为了连通这两个模块，我们继续研究多维表格：把之前的电子表格登记，改成多维表格登记。</p><p>这样登记软件负责写入多维表格，影刀的读取和后续导单动作也改为围绕多维表格进行，最终实现登记和导单的闭环全流程。</p></div>
+      <div class="screenshot-gallery">
+        <button class="screenshot-card" type="button" data-lightbox-src="assets/order-table-before.png" aria-label="放大查看旧版导单表截图">
+          <img src="assets/order-table-before.png" alt="旧版导单表截图" onerror="this.closest('.screenshot-card').classList.add('is-missing')">
+          <span>旧版导单表</span>
+        </button>
+        <button class="screenshot-card" type="button" data-lightbox-src="assets/order-table-after.png" aria-label="放大查看新版导单表截图">
+          <img src="assets/order-table-after.png" alt="新版导单表截图" onerror="this.closest('.screenshot-card').classList.add('is-missing')">
+          <span>新版导单表</span>
+        </button>
+      </div>
+      <div class="quote">好的自动化，不只是自己少做一步，而是让整个协作流程更顺。</div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s16">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <h2>流程闭环：登记、导单、推送逐步接上</h2>
+      <div class="text"><p>到这一步，前面的登记、匹配、导单、吉客云导入、单号推送，就开始逐步接上了。</p><p>它不只是多做了一个功能，而是把原来分散的模块接成一条流程。</p><p>很多流程不是一开始就能完整闭环的，通常是先跑通一个点，再接上另一个点，最后才慢慢变成完整链路。</p></div>
+      <div class="flow"><div class="flow-card">登记软件录入</div><div class="flow-card">多维表格保存</div><div class="flow-card">影刀读取导单</div><div class="flow-card">生成本地 Excel</div><div class="flow-card">吉客云导入</div><div class="flow-card">单号自动推送</div></div>
+      <div class="quote">完整闭环的价值，是让每个模块不再孤立，而是前后接得上、跑得通。</div>
+    </div>
+  </section>
+
+
+  <section class="slide video-showcase" id="s16-video">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      <div class="stage-kicker">完整链路 / 视频演示</div>
+      <h2>完整闭环视频展示</h2>
+      <div class="media-frame">
+        <div class="video-placeholder">
+          <video class="demo-video" controls preload="metadata">
+            <source src="assets/完整闭环.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="iteration-list">
+          <div class="iteration-item"><span class="iteration-mark">01</span><div class="iteration-copy"><strong>登记</strong><span>登记软件读取信息并写入多维表格。</span></div></div>
+          <div class="iteration-item"><span class="iteration-mark">02</span><div class="iteration-copy"><strong>导单</strong><span>影刀继续读取数据并完成后续导单动作。</span></div></div>
+          <div class="iteration-item"><span class="iteration-mark">03</span><div class="iteration-copy"><strong>推送</strong><span>登记、导单、单号推送逐步接成完整闭环。</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s17">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <h2>从导单案例抽象出通用问题</h2>
+      <div class="text"><p>如果只看表面，这次是在解决导单。但往下拆一层，它其实是在解决一类更通用的业务问题：把非结构化信息变成结构化数据，把人工判断变成稳定规则，把跨平台动作变成可重复流程。</p><p>导单案例里经历的每一个阶段——先固定格式、再接工具、遇到卡点换路径、最后形成闭环——这条路径本身就是一个可以复用的思路。</p></div>
+      <div class="flow"><div class="flow-card">固定格式结构</div><div class="flow-card">接入自动化工具</div><div class="flow-card">卡点换路径</div><div class="flow-card">模块逐步闭环</div><div class="flow-card">持续迭代稳定</div></div>
+      <div class="quote">导单是案例，背后真正可复用的是”逐步固定、逐步接通”的推进方式。</div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s18">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <h2>这个方法能不能复用到其它场景</h2>
+      <div class="text"><p>在把方法迁移到其他场景之前，先做一个判断：这件事值不值得拆？</p><p>判断标准不是”有没有导单”，而是三个问题：有没有固定输入？中间规则说不说得清楚？最终输出是不是明确的？三个都是，就值得往下拆。</p><p>拆的时候也不要照搬动作，而是照搬逻辑：先把目标定清楚，再看人工怎么做，找到规则在哪里，再决定哪段交给表格、AI 或自动化工具。</p></div>
+      <div class="flow"><div class="flow-card">固定输入？</div><div class="flow-card">规则说得清？</div><div class="flow-card">输出明确？</div><div class="flow-card">值得拆解</div><div class="flow-card">照搬逻辑复用</div></div>
+      <div class="quote">复用的不是某个工具或动作，而是”先判断、再拆解、遇卡点换路径”的思维方式。</div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s19">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <h2>可复用方法：先判断，再拆解</h2>
+      <div class="text"><p>这次分享真正值得大家带走的不是某一个工具，而是学会怎么拆解问题、复用方法，并在原路走不通时换一种方式达成目标。</p><p>如果一个工作高频重复、规则稳定、影响明显，而且有固定输入和明确输出，就可以继续往下拆：目标是什么，人工怎么做，规则在哪里，哪一段适合交给表格、AI 或自动化工具。</p><p>遇到卡点时，不要只盯着原动作，而是回到目标。只要输出结果不变，中间路径可以重新设计。</p></div>
+      <div class="method">
+      <article class="method-card"><span class="num">1</span><h3>高频重复</h3><p>每天或每周都在做，且步骤差不多。</p></article>
+      <article class="method-card"><span class="num">2</span><h3>规则稳定</h3><p>字段、模板、匹配关系可以被说清楚。</p></article>
+      <article class="method-card"><span class="num">3</span><h3>影响明显</h3><p>一旦慢、漏、错，会影响交付或数据准确性。</p></article>
+      <article class="method-card"><span class="num">4</span><h3>固定输入</h3><p>订单、表格、截图、剪贴板或系统字段可以作为入口。</p></article>
+      <article class="method-card"><span class="num">5</span><h3>明确输出</h3><p>最终要生成记录、文件、消息、报表或系统结果。</p></article>
+    </div>
+      <div class="quote">先判断是不是值得拆，再按“目标-动作-规则-工具-闭环”往下拆。</div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s20">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      
+      <h2>让 AI 帮我们拆出自动化思路</h2>
+      <div class="ai-breakdown-layout">
+        <div class="ai-prompt-panel">
+          <div class="text"><p>AI 更适合做“拆解顾问”：先给它目标、流程和卡点，再让它判断优先级。</p></div>
+          <div class="prompt-steps">
+            <div class="prompt-step"><span class="num">1</span><div><strong>目标</strong><span>最后要得到什么。</span></div></div>
+            <div class="prompt-step"><span class="num">2</span><div><strong>流程</strong><span>现在人工怎么做。</span></div></div>
+            <div class="prompt-step"><span class="num">3</span><div><strong>卡点</strong><span>哪里最慢、最容易错。</span></div></div>
+          </div>
+        </div>
+        <section class="ai-workbench" aria-label="AI 自动化拆解示例">
+          <div class="ai-window-bar"><i></i><i></i><i></i><strong>Codex 自动化拆解示例</strong></div>
+          <div class="ai-workbench-grid">
+            <article class="ai-input-card">
+              <h3>我给 AI 的原始流程</h3>
+              <p>现在人工需要：复制订单信息、整理字段、查询 SKU 和条码、核对物料编码，再填写导单表，最后导入吉客云。</p>
+              <p>请判断能不能自动化？如果可以，应该怎么拆模块，先做哪一步最稳？</p>
+              <span class="ai-chip">问题先讲清楚</span>
+            </article>
+            <div class="ai-connector" aria-hidden="true"></div>
+            <article class="ai-output-card">
+              <h3>Codex 给出的答复</h3>
+              <div class="answer-callout">可以自动化，但不要先模仿人工操作<small>最稳的第一步：先固定输入是什么，最终要生成什么格式。</small></div>
+              <ol class="answer-steps">
+                <li><b>1</b><b>读取信息</b><span>从剪贴板或电子表格拿到订单内容</span></li>
+                <li><b>2</b><b>整理字段</b><span>把订单信息拆成固定字段</span></li>
+                <li><b>3</b><b>匹配规则</b><span>用多维表格匹配 SKU 和物料编码</span></li>
+                <li><b>4</b><b>生成结果</b><span>写入多维表格，或生成吉客云需要的 Excel</span></li>
+                <li><b>5</b><b>交给工具执行</b><span>让影刀继续读取数据、导入吉客云</span></li>
+              </ol>
+            </article>
+          </div>
+          <div class="ai-route-note">中间路径不一定照搬人工动作，可以让多维表格、AI 和自动化工具协作完成。</div>
+        </section>
+      </div>
+    
+      <div class="quote">先把流程讲清楚，再让 AI 帮我们拆出自动化优先级和实现路径。</div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s21">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      <div class="eyebrow">可靠 · 极致</div>
+      <h2>工作中也要多想一步，多做一步</h2>
+      <ul class="point-list">
+        <li>工具会更新换代，但遇到重复工作时先停下来想一想、把它拆清楚的习惯，是长期有用的。</li>
+        <li>先把动作背后的原因、规则和协作关系看清楚，再决定哪些部分值得沉淀成模板、字段、规则或工具。</li>
+        <li>可靠是基础，极致来自持续迭代：每次改进一点，流程就会更顺、更稳、更可复用。</li>
+      </ul>
+      <div class="flow"><div class="flow-card">可靠运行</div><div class="flow-card">看见原因</div><div class="flow-card">沉淀规则</div><div class="flow-card">复用方法</div><div class="flow-card">持续优化</div></div>
+      <div class="quote">极致不是一次做到完美，而是让每一次重复工作都比上一次更可靠。</div>
+    </div>
+  </section>
+
+
+  <section class="slide" id="s22">
+    <div class="logo"><img src="assets/lanhe-logo.svg" alt="蓝禾 LANHE logo" onerror="this.style.display='none'"><span class="fallback">LANHE 蓝禾</span></div>
+    <div class="page-no">00 / 26</div>
+    <div class="content">
+      <div class="eyebrow">谢谢聆听</div>
+      <h2>今天的分享到这里就结束了</h2>
+      <div class="text"><p>谢谢大家的时间。希望这次分享不只是听完一个导单案例，而是以后遇到类似问题时，能多一个拆解问题的入口。</p><p>先定清目标、再拆流程、找到卡点，遇到走不通就换路径，再决定用表格、AI 还是自动化工具去接。工具会变，但把问题拆清楚、把方法复用起来的能力可以一直带走。</p></div>
+      <div class="flow"><div class="flow-card">定清目标</div><div class="flow-card">拆清流程</div><div class="flow-card">卡点换路径</div><div class="flow-card">沉淀方法</div><div class="flow-card">复用到更多场景</div></div>
+      <div class="quote">愿我们都能把重复的事情慢慢做得更顺、更稳、更有价值。</div>
+    </div>
+  </section>
+
+  <div class="image-lightbox" role="dialog" aria-modal="true" aria-label="截图大图预览">
+    <button type="button" aria-label="关闭大图预览">×</button>
+    <img src="" alt="">
+  </div>
+
+  <script>
+    var slides = document.querySelectorAll(".slide");
+    var total = String(slides.length).padStart(2, "0");
+    var revealSteps = [];
+    var revealState = [];
+    var initialRevealStep = 1;
+    var motionEnabled = window.matchMedia("(prefers-reduced-motion: no-preference)").matches;
+
+    function setupPresentationMotion() {
+      if (!motionEnabled) return;
+      document.body.classList.add("motion-ready");
+
+      slides.forEach(function (slide, slideIndex) {
+        var stagedSelectors = [
+          [".logo, .page-no, .eyebrow, .stage-kicker"],
+          ["h1, h2"],
+          [".lead, .speaker, .body-copy, .text, .point-list li, .pill, .cover-art, .video-placeholder, .placeholder, .screenshot-gallery, .panel, .ai-demo-layout, .ai-breakdown-layout, .two-col, .placeholder-grid, .media-frame, .why-how, .flow-card, .method-card, .agenda-grid, .timeline"],
+          [".quote"]
+        ];
+        var maxStep = 0;
+        var stagger = 0;
+
+        stagedSelectors.forEach(function (group, step) {
+          slide.querySelectorAll(group[0]).forEach(function (el) {
+            if (el.hasAttribute("data-reveal")) return;
+            el.setAttribute("data-reveal", String(step));
+            el.style.setProperty("--stagger", String(stagger));
+            maxStep = Math.max(maxStep, step);
+            stagger += 1;
+          });
+        });
+
+        slide.querySelectorAll(".flow-card").forEach(function (card, index) {
+          card.setAttribute("data-step", String(index + 1).padStart(2, "0"));
+        });
+
+        revealSteps[slideIndex] = maxStep;
+        revealState[slideIndex] = Math.min(maxStep, initialRevealStep);
+      });
+    }
+
+    function updateActiveSlideClasses() {
+      if (!motionEnabled) return;
+      slides.forEach(function (slide, index) {
+        slide.classList.toggle("is-active", index === currentSlideIndex);
+        slide.classList.toggle("is-past", index < currentSlideIndex);
+        slide.querySelectorAll("[data-reveal]").forEach(function (el) {
+          var step = Number(el.getAttribute("data-reveal") || 0);
+          var visible = index < currentSlideIndex || (index === currentSlideIndex && step <= revealState[index]);
+          el.setAttribute("data-revealed", visible ? "true" : "false");
+        });
+      });
+    }
+
+    function advanceReveal() {
+      if (!motionEnabled) return false;
+      var maxStep = revealSteps[currentSlideIndex] || 0;
+      if (revealState[currentSlideIndex] < maxStep) {
+        revealState[currentSlideIndex] += 1;
+        updateActiveSlideClasses();
+        return true;
+      }
+      return false;
+    }
+
+    function retreatReveal() {
+      if (!motionEnabled) return false;
+      var minStep = Math.min(revealSteps[currentSlideIndex] || 0, initialRevealStep);
+      if (revealState[currentSlideIndex] > minStep) {
+        revealState[currentSlideIndex] -= 1;
+        updateActiveSlideClasses();
+        return true;
+      }
+      return false;
+    }
+
+    setupPresentationMotion();
+    slides.forEach(function (slide, index) {
+      var pageNo = slide.querySelector(".page-no");
+      if (pageNo) {
+        pageNo.textContent = String(index + 1).padStart(2, "0") + " / " + total;
+      }
+    });
+
+    document.querySelectorAll(".logo img").forEach(function (img) {
+      function updateLogoState() {
+        if (img.complete && img.naturalWidth > 0) {
+          var fallback = img.nextElementSibling;
+          if (fallback) fallback.style.display = "none";
+        }
+      }
+      img.addEventListener("load", updateLogoState);
+      updateLogoState();
+    });
+
+    document.querySelectorAll(".demo-video").forEach(function (video) {
+      video.addEventListener("loadedmetadata", function () {
+        var frame = video.closest(".video-placeholder");
+        if (frame) frame.classList.add("has-video");
+      });
+    });
+
+    var currentScale = 1;
+    var currentSlideIndex = 0;
+    var slideStatus = document.querySelector(".slide-status");
+    var deckNav = document.querySelector(".deck-nav");
+    var suppressScrollDetectionUntil = 0;
+
+    if (deckNav) {
+      deckNav.innerHTML = "";
+      slides.forEach(function (slide, index) {
+        if (!slide.id) slide.id = "s" + (index + 1);
+        var link = document.createElement("a");
+        link.href = "#" + slide.id;
+        link.title = String(index + 1).padStart(2, "0");
+        link.setAttribute("aria-label", "跳转到第 " + String(index + 1).padStart(2, "0") + " 页");
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+          goToSlide(index);
+        });
+        deckNav.appendChild(link);
+      });
+    }
+
+    function updateSlideStatus() {
+      if (slideStatus) {
+        slideStatus.textContent = String(currentSlideIndex + 1).padStart(2, "0") + " / " + total;
+      }
+      if (deckNav) {
+        deckNav.querySelectorAll("a").forEach(function (link, index) {
+          link.classList.toggle("is-current", index === currentSlideIndex);
+        });
+      }
+    }
+
+    function detectCurrentSlide() {
+      if (window.matchMedia("(max-width: 900px)").matches) {
+        var verticalCenter = window.scrollY + window.innerHeight / 2;
+        var verticalBestIndex = 0;
+        var verticalBestDistance = Infinity;
+        slides.forEach(function (slide, index) {
+          var slideCenter = slide.offsetTop + slide.offsetHeight / 2;
+          var distance = Math.abs(verticalCenter - slideCenter);
+          if (distance < verticalBestDistance) {
+            verticalBestDistance = distance;
+            verticalBestIndex = index;
+          }
+        });
+      currentSlideIndex = verticalBestIndex;
+      updateSlideStatus();
+      updateActiveSlideClasses();
+      return;
+      }
+
+      var center = window.scrollX + window.innerWidth / 2;
+      var bestIndex = 0;
+      var bestDistance = Infinity;
+      slides.forEach(function (slide, index) {
+        var slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+        var distance = Math.abs(center - slideCenter);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestIndex = index;
+        }
+      });
+      currentSlideIndex = bestIndex;
+      updateSlideStatus();
+      updateActiveSlideClasses();
+    }
+
+    function goToSlide(index, behavior) {
+      currentSlideIndex = Math.max(0, Math.min(slides.length - 1, index));
+      suppressScrollDetectionUntil = Date.now() + 480;
+      if (motionEnabled && revealState[currentSlideIndex] === undefined) {
+        revealState[currentSlideIndex] = Math.min(revealSteps[currentSlideIndex] || 0, initialRevealStep);
+      }
+      slides[currentSlideIndex].scrollIntoView({ behavior: behavior || "smooth", block: "nearest", inline: "center" });
+      updateSlideStatus();
+      updateActiveSlideClasses();
+    }
+
+    function setDeckScale(nextScale) {
+      currentScale = Math.max(.75, Math.min(1.45, nextScale));
+      document.body.style.setProperty("--deck-scale", currentScale.toFixed(2));
+      document.body.style.setProperty("--deck-extra", Math.max(18, 28 + (currentScale - 1) * 520).toFixed(0) + "px");
+    }
+
+    function toggleFullscreen() {
+      var root = document.documentElement;
+      if (!document.fullscreenElement && root.requestFullscreen) {
+        root.requestFullscreen();
+      } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+
+    function enterDeckFullscreen() {
+      var root = document.documentElement;
+      if (!document.fullscreenElement && root.requestFullscreen) {
+        root.requestFullscreen();
+      }
+    }
+
+    function exitPresentationFullscreen() {
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+
+    document.addEventListener("fullscreenchange", function () {
+      var fullscreenElement = document.fullscreenElement;
+      var isDeckFullscreen = fullscreenElement === document.documentElement;
+      var isVideoFullscreen = Boolean(fullscreenElement && fullscreenElement.matches && fullscreenElement.matches(".demo-video"));
+
+      document.body.classList.toggle("is-fullscreen", isDeckFullscreen);
+      document.body.classList.toggle("is-video-fullscreen", isVideoFullscreen);
+
+      if (!isVideoFullscreen) {
+        window.requestAnimationFrame(function () {
+          goToSlide(currentSlideIndex, "auto");
+        });
+      }
+    });
+
+    document.querySelectorAll(".deck-controls button").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var action = button.getAttribute("data-action");
+        if (action === "prev") {
+          if (retreatReveal()) return;
+          goToSlide(currentSlideIndex - 1);
+        }
+        if (action === "next") {
+          if (advanceReveal()) return;
+          goToSlide(currentSlideIndex + 1);
+        }
+        if (action === "zoom-in") setDeckScale(currentScale + .1);
+        if (action === "zoom-out") setDeckScale(currentScale - .1);
+        if (action === "zoom-reset") setDeckScale(1);
+        if (action === "fullscreen") toggleFullscreen();
+      });
+    });
+
+    var imageLightbox = document.querySelector(".image-lightbox");
+    var imageLightboxImg = imageLightbox.querySelector("img");
+
+    function closeImageLightbox() {
+      imageLightbox.classList.remove("is-open");
+      imageLightboxImg.src = "";
+      imageLightboxImg.alt = "";
+    }
+
+    document.querySelectorAll("[data-lightbox-src]").forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        event.stopPropagation();
+        imageLightboxImg.src = button.getAttribute("data-lightbox-src");
+        imageLightboxImg.alt = button.getAttribute("aria-label");
+        imageLightbox.classList.add("is-open");
+      });
+    });
+
+    imageLightbox.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      closeImageLightbox();
+    });
+
+    document.addEventListener("click", function (event) {
+      if (event.target.closest && event.target.closest("a, button, video, .video-placeholder, .image-lightbox, .deck-controls, .deck-nav")) return;
+      if (advanceReveal()) return;
+      goToSlide(currentSlideIndex + 1);
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.target && /input|textarea|select/i.test(event.target.tagName)) return;
+      if (event.key === "Escape" && imageLightbox.classList.contains("is-open")) {
+        closeImageLightbox();
+        return;
+      }
+      if (event.key === "f" || event.key === "F") {
+        event.preventDefault();
+        enterDeckFullscreen();
+        return;
+      }
+      if (event.key === "g" || event.key === "G") {
+        event.preventDefault();
+        exitPresentationFullscreen();
+        return;
+      }
+      if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+        event.preventDefault();
+        if (advanceReveal()) return;
+        goToSlide(currentSlideIndex + 1);
+      }
+      if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        event.preventDefault();
+        if (retreatReveal()) return;
+        goToSlide(currentSlideIndex - 1);
+      }
+      if (event.key === "+" || event.key === "=") setDeckScale(currentScale + .1);
+      if (event.key === "-" || event.key === "_") setDeckScale(currentScale - .1);
+      if (event.key === "0") setDeckScale(1);
+    });
+
+    var wheelLock = false;
+    window.addEventListener("wheel", function (event) {
+      if (window.matchMedia("(max-width: 900px)").matches) return;
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+      event.preventDefault();
+      if (wheelLock) return;
+      wheelLock = true;
+      if (event.deltaY > 0) {
+        if (!advanceReveal()) goToSlide(currentSlideIndex + 1);
+      } else {
+        if (!retreatReveal()) goToSlide(currentSlideIndex - 1);
+      }
+      window.setTimeout(function () {
+        wheelLock = false;
+      }, 520);
+    }, { passive: false });
+
+    window.addEventListener("scroll", function () {
+      if (Date.now() < suppressScrollDetectionUntil) return;
+      window.requestAnimationFrame(detectCurrentSlide);
+    }, { passive: true });
+
+    var initialHashIndex = -1;
+    if (window.location.hash) {
+      slides.forEach(function (slide, index) {
+        if ("#" + slide.id === window.location.hash) initialHashIndex = index;
+      });
+    }
+    if (initialHashIndex >= 0) {
+      goToSlide(initialHashIndex, "auto");
+      window.setTimeout(function () {
+        goToSlide(initialHashIndex, "auto");
+      }, 80);
+    } else {
+      detectCurrentSlide();
+    }
+    updateActiveSlideClasses();
+  </script>
+
+</body>
+</html>
+

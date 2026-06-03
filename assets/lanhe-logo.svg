@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 90" role="img" aria-label="Lanhe 蓝禾">
+  <title>Lanhe 蓝禾</title>
+  <rect width="340" height="90" fill="none"/>
+  <g fill="#0b55f4">
+    <text x="0" y="66"
+      font-family="Arial Black, Arial, Helvetica, sans-serif"
+      font-size="66"
+      font-weight="900"
+      letter-spacing="-5">Lanhe</text>
+    <text x="238" y="63"
+      font-family="Microsoft YaHei, PingFang SC, Noto Sans CJK SC, Arial, sans-serif"
+      font-size="38"
+      font-weight="900"
+      letter-spacing="0">蓝禾</text>
+  </g>
+</svg>
